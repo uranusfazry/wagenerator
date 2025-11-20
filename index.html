@@ -4,9 +4,10 @@
   <meta charset="utf-8" />
   <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>WhatsApp Pro Creator</title>
+  <title>WhatsApp Pro Creator 4K</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Load Html2Canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
@@ -344,7 +345,7 @@
       <!-- LOADING SCREENSHOT -->
       <div class="loading-overlay" id="loadingOverlay">
           <div class="spinner"></div>
-          <div>Memproses Gambar...</div>
+          <div>Memproses Kualitas 4K...</div>
       </div>
 
       <div class="topbar">
@@ -669,7 +670,7 @@
     function downloadFromModal() {
         closeEditor();
         setTimeout(() => {
-             showConfirm(processScreenshot, "Simpan tampilan daftar chat?");
+             showConfirm(processScreenshot, "Simpan tampilan dengan kualitas 4K?");
         }, 350);
     }
 
@@ -686,14 +687,20 @@
         setTimeout(() => {
             let currentBg = isLightMode ? '#ffffff' : '#04070a';
             
+            // FORCE 4K SCALE
+            // Scale 5 pada container 480px akan menghasilkan lebar 2400px (sangat tajam)
+            const qualityScale = 5; 
+
             html2canvas(appContainer, {
+                scale: qualityScale, 
                 useCORS: true, 
                 allowTaint: true,
                 backgroundColor: currentBg,
+                logging: false, // Mematikan log console
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay';
                 },
-                // FIX: Baking filter manually for light mode screenshot
+                // FIX: Manual Filter untuk Light Mode
                 onclone: (clonedDoc) => {
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
@@ -711,19 +718,20 @@
                 }
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'WA-Mock-' + Date.now() + '.png';
-                link.href = canvas.toDataURL("image/png");
+                // Nama file dengan indikator 4K
+                link.download = 'WA-Mock-4K-' + Date.now() + '.png';
+                link.href = canvas.toDataURL("image/png", 1.0); // Quality 1.0
                 link.click();
                 fab.style.display = 'flex';
                 loading.classList.remove('show');
-                showToast("Screenshot berhasil disimpan!");
+                showToast("Screenshot 4K berhasil disimpan!");
             }).catch(err => {
                 console.error(err);
                 fab.style.display = 'flex';
                 loading.classList.remove('show');
                 showToast("Gagal membuat screenshot");
             });
-        }, 500); 
+        }, 800); // Sedikit delay lebih lama untuk rendering
     }
 
     // INIT
