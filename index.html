@@ -412,18 +412,16 @@
         to { transform: scale(1); opacity: 1; }
     }
 
-    /* 2. Sidebar Ads (Desktop Only - 160x600) */
+    /* 2. Sidebar Ads (Desktop Only) */
     .ad-sidebar {
         position: fixed;
         top: 50%;
         transform: translateY(-50%);
-        width: 160px;
-        height: 600px;
         z-index: 5;
         display: none; /* Hidden on mobile */
     }
-    .ad-left { left: 10px; }
-    .ad-right { right: 10px; }
+    .ad-left { left: 10px; width: 160px; height: 600px; }
+    .ad-right { right: 10px; width: 160px; height: 300px; }
     
     @media screen and (min-width: 850px) {
         .ad-sidebar { display: block; }
@@ -449,7 +447,29 @@
         border-color: rgba(0,0,0,0.1);
     }
 
-    /* 4. Native Ad Container (In-Feed) */
+    /* 4. Desktop Top & Bottom Banners */
+    .ad-desktop-top {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        display: none;
+    }
+    .ad-desktop-bottom {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        display: none;
+    }
+    
+    @media screen and (min-width: 850px) {
+        .ad-desktop-top, .ad-desktop-bottom { display: block; }
+    }
+
+    /* 5. Native Ad Container (In-Feed) */
     .ad-native-container {
         padding: 10px;
         background: rgba(255,255,255,0.03);
@@ -469,7 +489,23 @@
 <body>
 
   <!-- =========================== -->
-  <!-- 1. INTERSTITIAL AD OVERLAY -->
+  <!-- 1. DESKTOP TOP AD (728x90) -->
+  <!-- =========================== -->
+  <div class="ad-desktop-top">
+      <script type="text/javascript">
+        atOptions = {
+            'key' : '22c516c3390536879e685a1dc3ac1451',
+            'format' : 'iframe',
+            'height' : 90,
+            'width' : 728,
+            'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/22c516c3390536879e685a1dc3ac1451/invoke.js"></script>
+  </div>
+
+  <!-- =========================== -->
+  <!-- 2. INTERSTITIAL AD OVERLAY -->
   <!-- =========================== -->
   <div class="ad-interstitial-overlay" id="interstitialAd">
       <div class="ad-interstitial-content">
@@ -492,7 +528,7 @@
   </div>
 
   <!-- =========================== -->
-  <!-- 2. SIDEBAR ADS (DESKTOP)   -->
+  <!-- 3. SIDEBAR ADS (DESKTOP)   -->
   <!-- =========================== -->
   
   <!-- Left Sidebar 160x600 -->
@@ -509,18 +545,18 @@
       <script type="text/javascript" src="//lightingshovestature.com/eaedd1f5161104e04d378842c7366a03/invoke.js"></script>
   </div>
 
-  <!-- Right Sidebar 160x600 -->
+  <!-- Right Sidebar 160x300 -->
   <div class="ad-sidebar ad-right">
       <script type="text/javascript">
         atOptions = {
-            'key' : 'eaedd1f5161104e04d378842c7366a03',
+            'key' : '6a54ae250144ccb6d0a026d43b4eebb3',
             'format' : 'iframe',
-            'height' : 600,
+            'height' : 300,
             'width' : 160,
             'params' : {}
         };
       </script>
-      <script type="text/javascript" src="//lightingshovestature.com/eaedd1f5161104e04d378842c7366a03/invoke.js"></script>
+      <script type="text/javascript" src="//lightingshovestature.com/6a54ae250144ccb6d0a026d43b4eebb3/invoke.js"></script>
   </div>
 
 
@@ -552,7 +588,7 @@
       </div>
 
       <!-- =========================== -->
-      <!-- 3. MOBILE STICKY AD (INSIDE CONTAINER) -->
+      <!-- 4. MOBILE STICKY AD (INSIDE CONTAINER) -->
       <!-- =========================== -->
       <div class="ad-sticky-bottom">
           <!-- 320x50 Ad Code -->
@@ -648,9 +684,25 @@
       <div class="toast" id="toast">Notifikasi</div>
 
   </div> <!-- END APP CONTAINER -->
+  
+  <!-- =========================== -->
+  <!-- 5. DESKTOP BOTTOM AD (468x60) -->
+  <!-- =========================== -->
+  <div class="ad-desktop-bottom">
+      <script type="text/javascript">
+        atOptions = {
+            'key' : '17355bc9e7d009406b2ffa96a156d373',
+            'format' : 'iframe',
+            'height' : 60,
+            'width' : 468,
+            'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/17355bc9e7d009406b2ffa96a156d373/invoke.js"></script>
+  </div>
 
   <!-- =========================== -->
-  <!-- 4. POPUNDER & SOCIAL BAR   -->
+  <!-- 6. POPUNDER & SOCIAL BAR   -->
   <!-- =========================== -->
   
   <!-- Popunder Script (Sync) -->
