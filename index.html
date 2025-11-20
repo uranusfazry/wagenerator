@@ -12,6 +12,13 @@
   
   <style>
     :root{
+      /* --- PENGATURAN JARAK (PADDING) TERPISAH --- */
+      /* Atur jarak atas untuk Tampilan Desktop (Layar Lebar / Preview) */
+      --pad-top-desktop: 110px; 
+      
+      /* Atur jarak atas untuk Tampilan HP Asli (Layar Kecil) */
+      --pad-top-mobile: 85px;
+
       /* --- DARK MODE (Default) --- */
       --bg: #04070a; 
       --card: #0b1216;
@@ -112,8 +119,10 @@
         flex: 1; /* Mengisi ruang penuh */
         overflow-y: auto; /* KUNCI: Mengaktifkan scroll vertikal */
         overflow-x: hidden;
-        padding-top: 110px; /* Sesuaikan agar item pertama tidak tertutup header */
-        padding-bottom: 100px; /* Sesuaikan agar item terakhir tidak tertutup footer */
+        
+        /* MENGGUNAKAN VARIABEL DESKTOP SEBAGAI DEFAULT */
+        padding-top: var(--pad-top-desktop);
+        padding-bottom: 100px; 
         
         /* Smooth Scrolling untuk Mobile */
         -webkit-overflow-scrolling: touch; 
@@ -125,6 +134,14 @@
     .list::-webkit-scrollbar { 
         width: 0px;
         background: transparent; 
+    }
+
+    /* --- MEDIA QUERY KHUSUS MOBILE --- */
+    /* Jika lebar layar kurang dari 480px (HP Asli), gunakan jarak mobile */
+    @media screen and (max-width: 480px) {
+        .list {
+            padding-top: var(--pad-top-mobile);
+        }
     }
     
     .item{
