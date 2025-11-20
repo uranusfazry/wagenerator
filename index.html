@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
+  <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>WhatsApp Pro Creator</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +63,7 @@
     .app-container {
         width: 100%;
         max-width: var(--mobile-width);
-        height: 100%; /* Mengambil tinggi penuh dari body */
+        height: 100%;
         background: linear-gradient(180deg, var(--bg), #020305);
         position: relative;
         display: flex;
@@ -171,38 +172,28 @@
     /* --- FAB (NEW CHAT) --- */
     .fab{
       position:absolute; /* Absolute relative to App Container */
-      bottom: 110px; /* Disesuaikan agar di atas bottom bar */
-      right: 20px; 
-      width: 56px; height: 56px; /* Ukuran standar FAB */
-      background: var(--badge-bg); /* Warna hijau WhatsApp */
-      border-radius: 50%;
+      bottom: 88px;
+      right: 20px; /* Diposisikan relatif kanan container */
+      width: 80px; height: 80px; /* Ukuran container FAB disesuaikan */
+      background: transparent;
       display:flex; align-items:center; justify-content:center;
       cursor: pointer; z-index: 15;
       transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4); /* Shadow untuk FAB */
     }
-    .fab:active { transform: scale(0.92); }
     .fab img { 
-        width: 24px; /* Ukuran ikon di dalam FAB */
-        height: 24px;
-        object-fit: contain;
-        filter: invert(1) brightness(2); /* Membuat ikon putih */
+        width: 130px; /* Gambar asli mungkin punya padding transparan, kita atur ulang */
+        max-width: none; /* Biarkan overflow jika perlu untuk centering efek shadow */
         pointer-events: none; 
-        user-select: none; 
-        -webkit-user-drag: none; 
         transition: filter 0.3s; 
     }
-    /* Filter FAB icon untuk Light Mode */
-    [data-theme="light"] .fab img {
-        filter: none; /* Kembali ke warna asli ikon jika light mode */
-    }
+    .fab:active { transform: scale(0.92); }
 
-
-    /* --- MODAL SYSTEM (Absolute Positioning inside Container) --- */
+    /* --- MODAL SYSTEM (Tetap Fixed Fullscreen atau Absolute Container) --- */
+    /* Kita gunakan absolute agar tetap di dalam konteks HP */
     .modal-overlay {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6);
-      display: flex; align-items: flex-end; /* Tetap dari bawah */
+      display: flex; align-items: flex-end; 
       justify-content: center;
       z-index: 100;
       opacity: 0; pointer-events: none;
@@ -214,7 +205,6 @@
     .modal-container {
       background: var(--modal-bg);
       width: 100%;
-      max-width: var(--mobile-width); /* Batasi lebar di dalam app-container */
       border-radius: 20px 20px 0 0; 
       padding: 24px 24px 40px 24px;
       box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
@@ -293,7 +283,7 @@
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); opacity: 0.7; }
     .btn-danger:active { background: rgba(239,68,68,0.1); opacity: 1; }
 
-    /* --- CONFIRMATION POPUP (Absolute Positioning inside Container) --- */
+    /* --- CONFIRMATION POPUP (Custom) --- */
     .confirm-overlay {
       position: absolute; top:0; left:0; right:0; bottom:0;
       background: rgba(0,0,0,0.7); z-index: 200;
@@ -318,7 +308,7 @@
     .c-btn-ok { color: var(--accent); } 
     .c-btn:active { background: rgba(100,100,100,0.1); }
 
-    /* --- TOAST NOTIFICATION (Absolute Positioning inside Container) --- */
+    /* --- TOAST NOTIFICATION --- */
     .toast {
       position: absolute; bottom: 100px; 
       left: 50%; transform: translateX(-50%) translateY(20px);
@@ -330,7 +320,7 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     
-    /* Loading Overlay (Absolute Positioning inside Container) */
+    /* Loading Overlay */
     .loading-overlay {
         position: absolute; top:0; left:0; right:0; bottom:0;
         background: rgba(0,0,0,0.8); z-index: 999;
@@ -366,7 +356,7 @@
 
       <!-- FAB -->
       <div class="fab" title="Buat Chat Baru" onclick="openEditor()">
-        <img id="fabIcon" src="https://i.imghippo.com/files/1K3d44Ff.png" draggable="false" alt="New Chat" crossorigin="anonymous">
+        <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="transform: translate(15px, 10px); width: 100%;" crossorigin="anonymous">
       </div>
 
       <div class="bottom">
@@ -497,13 +487,11 @@
         if(isLightMode) {
             document.body.setAttribute('data-theme', 'light');
             themeIcon.innerHTML = '<path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>';
-            fabIcon.src = "https://i.imghippo.com/files/NLt8463pM.png"; // Icon dark mode
-            fabIcon.style.filter = 'none'; // Clear filter for light mode FAB icon
+            fabIcon.src = "https://i.imghippo.com/files/NLt8463pM.png";
         } else {
             document.body.removeAttribute('data-theme');
             themeIcon.innerHTML = '<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>';
-            fabIcon.src = "https://i.imghippo.com/files/1K3d44Ff.png"; // Icon light mode (putih)
-            fabIcon.style.filter = 'invert(1) brightness(2)'; // Re-apply filter for dark mode FAB icon (if needed, otherwise the CSS takes over)
+            fabIcon.src = "https://i.imghippo.com/files/toKE4058Rk.png";
         }
     }
 
@@ -691,8 +679,10 @@
         const fab = document.querySelector('.fab');
         fab.style.display = 'none';
         
+        // Scroll container to top
         const appContainer = document.querySelector('.app-container');
         
+        // Use html2canvas on the App Container only
         setTimeout(() => {
             let currentBg = isLightMode ? '#ffffff' : '#04070a';
             
@@ -703,6 +693,7 @@
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay';
                 },
+                // FIX: Baking filter manually for light mode screenshot
                 onclone: (clonedDoc) => {
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
