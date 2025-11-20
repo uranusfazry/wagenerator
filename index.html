@@ -2,13 +2,16 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <!-- Meta viewport diatur untuk mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>WhatsApp Pro Creator</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Library untuk Screenshot -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
   <style>
     :root{
-      /* UPDATE: Warna background dibuat jauh lebih gelap sesuai gambar */
       --bg: #04070a; 
       --card: #0b1216;
       --muted: #8696a0;
@@ -18,18 +21,35 @@
       --danger: #ef4444;
       --badge-bg: #25d366; 
       font-family: 'Inter', system-ui, sans-serif;
+      
+      /* Variabel untuk lebar maksimal tampilan mobile */
+      --mobile-width: 480px; 
     }
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
     
+    /* --- FORCE MOBILE LAYOUT ON DESKTOP --- */
+    html {
+        background-color: #111; /* Background luar area HP */
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
     body{
       margin:0;
-      /* UPDATE: Gradient disesuaikan ke warna yang lebih pekat/gelap */
       background: linear-gradient(180deg, var(--bg), #020305);
       color:var(--text-main);
       user-select: none; 
       -webkit-user-select: none;
       padding-bottom: 100px;
       overflow-x: hidden;
+      min-height: 100vh;
+      
+      /* KUNCI: Memaksa lebar body seperti HP */
+      width: 100%;
+      max-width: var(--mobile-width);
+      position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Bayangan agar terlihat seperti device */
     }
 
     /* --- UTILS --- */
@@ -61,7 +81,6 @@
 
     .meta{
       flex:1; min-width:0;
-      /* border-bottom dihapus agar tidak ada garis */
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
     }
@@ -87,29 +106,53 @@
       font-size: 11px; line-height: 1;
     }
 
-    /* --- FAB --- */
+    /* --- FAB (NEW CHAT) --- */
+    /* Dimodifikasi agar menempel di area mobile saat mode desktop */
     .fab{
-      position:fixed; right: -20px; bottom:88px;
+      position:fixed; 
+      bottom:88px;
       width:146px; height:146px;
       background: transparent;
       display:flex; align-items:center; justify-content:center;
       cursor: pointer; z-index: 10;
       transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      /* Posisi Relatif terhadap area mobile 480px */
+      left: 50%; 
+      right: auto;
+      margin-left: 90px; /* Menggeser ke kanan dari titik tengah */
     }
     .fab:active { transform: scale(0.92); }
     .fab img { pointer-events: none; user-select: none; -webkit-user-drag: none; }
 
-    .topbar, .bottom { position:fixed; left:0; right:0; z-index: 5; }
+    /* --- FIXED BARS (TOP & BOTTOM) --- */
+    /* Dimodifikasi agar tidak melebar ke seluruh layar monitor */
+    .topbar, .bottom { 
+        position:fixed; 
+        z-index: 5;
+        width: 100%;
+        max-width: var(--mobile-width);
+        left: 50%;
+        transform: translateX(-50%);
+    }
     .topbar { top:0; background: var(--bg); }
     .bottom { bottom:0; background: linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3)); pointer-events: none; }
     .bottom img { pointer-events: none; }
     
-    /* UPDATE: Tinggi spacer dinaikkan lagi jadi 170px */
     .spacer-top { height: 170px; } 
+    
+    /* Khusus Desktop (layar lebar > 480px) ubah tinggi spacer jadi 190px */
+    @media (min-width: 481px) {
+      .spacer-top { height: 190px; }
+    }
 
     /* --- MODAL SYSTEM --- */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed; top: 0; bottom: 0;
+      /* Posisi fix di tengah layar mobile */
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: var(--mobile-width);
+      
       background: rgba(0,0,0,0.6);
       display: flex; align-items: flex-end; 
       justify-content: center;
@@ -129,22 +172,35 @@
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    @media(min-width: 450px) {
-        .modal-overlay { align-items: center; }
-        .modal-container { border-radius: 24px; transform: scale(0.9); opacity: 0; }
-    }
+    
+    /* --- DIHAPUS: Media Query Desktop yang merubah modal jadi popup tengah --- */
+    /* @media(min-width: 450px) { ... } DIHAPUS AGAR TETAP SEPERTI MOBILE */
     
     .modal-overlay.open .modal-container {
       transform: translateY(0);
       opacity: 1;
     }
-    @media(min-width: 450px) {
-        .modal-overlay.open .modal-container { transform: scale(1); }
-    }
 
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-title { font-size: 20px; font-weight: 600; color: var(--text-main); }
-    .btn-close-icon { background:none; border:none; color:var(--muted); font-size:24px; cursor:pointer; }
+    
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn-close-icon { background:none; border:none; color:var(--muted); font-size:28px; cursor:pointer; line-height: 1; padding: 4px; }
+    
+    /* Button Download di Header */
+    .btn-header-dl {
+      background: rgba(0, 168, 132, 0.15);
+      border: none;
+      color: var(--accent);
+      border-radius: 12px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-header-dl:active { background: rgba(0, 168, 132, 0.25); }
+    .btn-header-dl svg { width: 20px; height: 20px; fill: currentColor; }
 
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 13px; color: var(--accent); margin-bottom: 6px; font-weight: 500; }
@@ -191,7 +247,11 @@
 
     /* --- CONFIRMATION POPUP (Custom) --- */
     .confirm-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
+      position: fixed; top:0; height:100%;
+      /* Fix posisi overlay di tengah */
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: var(--mobile-width);
+      
       background: rgba(0,0,0,0.7); z-index: 200;
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
@@ -215,7 +275,10 @@
 
     /* --- TOAST NOTIFICATION --- */
     .toast {
-      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+      position: fixed; bottom: 100px; 
+      /* Toast tetap di tengah area mobile */
+      left: 50%; transform: translateX(-50%) translateY(20px);
+      
       background: #333; color: white; padding: 12px 24px;
       border-radius: 50px; font-size: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -223,10 +286,35 @@
       z-index: 300; pointer-events: none; white-space: nowrap;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    /* Loading Overlay for Screenshot */
+    .loading-overlay {
+        position: fixed; top:0; height:100%;
+        /* Fix overlay loading */
+        left: 50%; transform: translateX(-50%);
+        width: 100%; max-width: var(--mobile-width);
+        
+        background: rgba(0,0,0,0.8); z-index: 999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: #00a884; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .loading-overlay.show { opacity: 1; pointer-events: auto; }
+    .spinner {
+        width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
+        border-top-color: #00a884; border-radius: 50%;
+        animation: spin 1s linear infinite; margin-bottom: 15px;
+    }
+    @keyframes spin { to {transform: rotate(360deg);} }
 
   </style>
 </head>
 <body>
+
+  <!-- LOADING SCREENSHOT -->
+  <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div>Memproses Gambar...</div>
+  </div>
 
   <div class="topbar">
     <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" />
@@ -243,11 +331,20 @@
     <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" />
   </div>
 
-  <!-- EDITOR MODAL --><div class="modal-overlay" id="editorModal">
+  <!-- EDITOR MODAL -->
+  <div class="modal-overlay" id="editorModal">
     <div class="modal-container">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Edit Chat</div>
-        <button class="btn-close-icon" onclick="closeEditor()">&times;</button>
+        <div class="header-actions">
+            <!-- UPDATE: Tombol Download dipindahkan ke sini -->
+            <button class="btn-header-dl" title="Download Screenshot" onclick="downloadFromModal()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"/>
+                </svg>
+            </button>
+            <button class="btn-close-icon" onclick="closeEditor()">&times;</button>
+        </div>
       </div>
       
       <div class="form-group">
@@ -293,32 +390,25 @@
     </div>
   </div>
 
-  <!-- CUSTOM CONFIRM MODAL --><div class="confirm-overlay" id="confirmModal">
+  <!-- CUSTOM CONFIRM MODAL -->
+  <div class="confirm-overlay" id="confirmModal">
     <div class="confirm-box">
-      <div class="confirm-text" id="confirmText">Hapus chat ini?</div>
+      <div class="confirm-text" id="confirmText">Konfirmasi?</div>
       <div class="confirm-buttons">
         <button class="c-btn c-btn-cancel" onclick="closeConfirm()">Batal</button>
-        <button class="c-btn c-btn-ok" id="confirmOkBtn">Hapus</button>
+        <button class="c-btn c-btn-ok" id="confirmOkBtn">Ya</button>
       </div>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION --><div class="toast" id="toast">Notifikasi</div>
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">Notifikasi</div>
 
   <script>
     /* --- PALET WARNA AVATAR --- */
     const avatarColors = [
-        '#00A884', // WA Teal
-        '#FF5252', // Red
-        '#FF9800', // Orange
-        '#3F51B5', // Indigo
-        '#2196F3', // Blue
-        '#9C27B0', // Purple
-        '#00BCD4', // Cyan
-        '#4CAF50', // Green
-        '#795548', // Brown
-        '#607D8B', // Blue Grey
-        '#E91E63'  // Pink
+        '#00A884', '#FF5252', '#FF9800', '#3F51B5', '#2196F3', 
+        '#9C27B0', '#00BCD4', '#4CAF50', '#795548', '#607D8B', '#E91E63'
     ];
 
     function getRandomColor() {
@@ -326,19 +416,16 @@
     }
 
     /* --- DATA --- */
-    // Menambahkan properti 'color' ke setiap objek chat
     let chats = [
       {name:'Zahra', msg:'Ardi temenin aku dong di kost', time:'20.41', unread:13, avatar:'Z', isImage: false, color: getRandomColor()},
       {name:'Putri', msg:'Ardi ketemu yuk kita jalan bareng', time:'20.41', unread:1, avatar:'P', isImage: false, color: getRandomColor()},
       {name:'Nabila', msg:'Ardi Call yuk kangen banget', time:'20.25', unread:1, avatar:'N', isImage: false, color: getRandomColor()},
     ];
     let editIdx = -1;
-    let tempDraftColor = ''; // Untuk menyimpan warna saat mode edit/create
+    let tempDraftColor = '';
 
     /* --- ELEMENTS --- */
     const listEl = document.getElementById('chatList');
-    
-    // Editor
     const modal = document.getElementById('editorModal');
     const modalTitle = document.getElementById('modalTitle');
     const inpName = document.getElementById('inpName');
@@ -350,9 +437,8 @@
     const avatarPrev = document.getElementById('avatarPrev');
     const hiddenBase64 = document.getElementById('currentImageBase64');
     const btnDelete = document.getElementById('btnDelete');
-
-    // Confirm & Toast
     const confirmModal = document.getElementById('confirmModal');
+    const confirmTextEl = document.getElementById('confirmText');
     const confirmOkBtn = document.getElementById('confirmOkBtn');
     const toastEl = document.getElementById('toast');
 
@@ -365,14 +451,12 @@
         el.onclick = () => openEditor(idx);
 
         let avatarContent = c.avatar;
-        // Jika belum ada warna (data lama), assign random
         if(!c.color) c.color = getRandomColor();
 
         if(c.isImage) {
             avatarContent = `<img src="${c.avatar}" alt="img">`;
         }
 
-        // Menambahkan inline style untuk background-color
         el.innerHTML = `
           <div class="avatar" style="background-color: ${c.color}">
             ${avatarContent}
@@ -395,26 +479,26 @@
     /* --- EDITOR LOGIC --- */
     function openEditor(idx = -1) {
       editIdx = idx;
-      // Reset Inputs
       inpAvatarFile.value = '';
       
       if(idx === -1) {
-        // NEW CHAT
         modalTitle.innerText = "Chat Baru";
         inpName.value = "";
         inpMsg.value = "";
-        inpTime.value = "Now";
+        
+        // UPDATE: Set waktu default ke jam sekarang (HH:MM)
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        inpTime.value = `${hours}:${minutes}`;
+        
         inpUnread.value = 1;
         inpAvatarText.value = "";
         hiddenBase64.value = "";
         btnDelete.style.display = "none";
-        
-        // Generate Random Color untuk Draft Baru
         tempDraftColor = getRandomColor();
         updateAvatarPreview('?', false, tempDraftColor);
-
       } else {
-        // EDIT CHAT
         const c = chats[idx];
         modalTitle.innerText = "Edit Chat";
         inpName.value = c.name;
@@ -422,8 +506,6 @@
         inpTime.value = c.time;
         inpUnread.value = c.unread;
         btnDelete.style.display = "block";
-        
-        // Pakai warna yang sudah ada
         tempDraftColor = c.color;
 
         if(c.isImage) {
@@ -436,7 +518,6 @@
             updateAvatarPreview(c.avatar, false, tempDraftColor);
         }
       }
-      
       modal.classList.add('open');
     }
 
@@ -447,7 +528,7 @@
     /* --- AVATAR HANDLING --- */
     inpAvatarText.addEventListener('input', (e) => {
         if(e.target.value) {
-            hiddenBase64.value = ""; // Clear image if typing text
+            hiddenBase64.value = "";
             updateAvatarPreview(e.target.value, false, tempDraftColor);
         }
     });
@@ -465,9 +546,7 @@
     });
 
     function updateAvatarPreview(val, isImg, bgColor) {
-        // Set background color preview
         avatarPrev.style.backgroundColor = bgColor;
-
         if(isImg) {
             avatarPrev.innerHTML = `<img src="${val}" style="width:100%;height:100%;object-fit:cover">`;
         } else {
@@ -478,7 +557,6 @@
     /* --- SAVE & DELETE --- */
     function saveChat() {
         const name = inpName.value || "Tanpa Nama";
-        
         let finalAvatar = "A";
         let isImage = false;
 
@@ -496,7 +574,7 @@
             unread: parseInt(inpUnread.value) || 0,
             avatar: finalAvatar,
             isImage: isImage,
-            color: tempDraftColor // Simpan warna
+            color: tempDraftColor
         };
 
         if(editIdx === -1) {
@@ -519,15 +597,17 @@
                     render();
                     showToast("Chat dihapus");
                 }
-            });
+            }, "Hapus chat ini?");
         }, 200);
     }
 
-    /* --- CUSTOM CONFIRMATION SYSTEM --- */
+    /* --- CONFIRM & TOAST --- */
     let onConfirmAction = null;
 
-    function showConfirm(action) {
+    function showConfirm(action, message) {
         onConfirmAction = action;
+        confirmTextEl.innerText = message || "Konfirmasi?";
+        confirmOkBtn.innerText = message && message.includes("Hapus") ? "Hapus" : "Ya";
         confirmModal.classList.add('show');
     }
 
@@ -541,7 +621,6 @@
         closeConfirm();
     }
 
-    /* --- TOAST SYSTEM --- */
     let toastTimeout;
     function showToast(msg) {
         toastEl.innerText = msg;
@@ -550,6 +629,52 @@
         toastTimeout = setTimeout(() => {
             toastEl.classList.remove('show');
         }, 3000);
+    }
+
+    /* --- SCREENSHOT LOGIC (FROM MODAL) --- */
+    
+    // 1. Trigger from modal
+    function downloadFromModal() {
+        closeEditor();
+        // Tunggu modal tutup (350ms) baru mulai proses screenshot
+        setTimeout(() => {
+             showConfirm(processScreenshot, "Simpan tampilan daftar chat?");
+        }, 350);
+    }
+
+    // 2. Process Screenshot
+    function processScreenshot() {
+        const loading = document.getElementById('loadingOverlay');
+        loading.classList.add('show');
+
+        const fab = document.querySelector('.fab');
+        fab.style.display = 'none';
+
+        window.scrollTo(0,0);
+
+        setTimeout(() => {
+            html2canvas(document.body, {
+                useCORS: true, 
+                allowTaint: true,
+                backgroundColor: '#04070a', 
+                windowWidth: document.documentElement.clientWidth,
+                windowHeight: document.documentElement.clientHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'WA-Mock-' + Date.now() + '.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+
+                fab.style.display = 'flex';
+                loading.classList.remove('show');
+                showToast("Screenshot berhasil disimpan!");
+            }).catch(err => {
+                console.error(err);
+                fab.style.display = 'flex';
+                loading.classList.remove('show');
+                showToast("Gagal membuat screenshot");
+            });
+        }, 500); 
     }
 
     // INIT
