@@ -2,74 +2,126 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <!-- Meta viewport diatur untuk mobile -->
+  <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>WhatsApp Pro Creator</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Library untuk Screenshot -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
     :root{
-      /* Mengembalikan warna dasar ke kode asli Anda */
+      /* --- DARK MODE (Default) --- */
       --bg: #04070a; 
       --card: #0b1216;
       --muted: #8696a0;
       --text-main: #e9edef;
+      --text-secondary: #8696a0;
       --accent: #00a884; 
       --modal-bg: #1f2c34; 
+      --input-bg: #2a3942;
       --danger: #ef4444;
       --badge-bg: #25d366; 
-      font-family: 'Inter', system-ui, sans-serif;
+      --badge-text: #000;
       
-      /* Variabel untuk lebar maksimal tampilan mobile */
+      font-family: 'Inter', system-ui, sans-serif;
       --mobile-width: 480px; 
     }
+
+    /* --- LIGHT MODE VARIABLES --- */
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --card: #f0f2f5;
+      --muted: #667781;
+      --text-main: #111b21;
+      --text-secondary: #667781;
+      --accent: #008069;
+      --modal-bg: #ffffff;
+      --input-bg: #f0f2f5;
+      --danger: #ea0038;
+      --badge-bg: #25d366;
+      --badge-text: #fff;
+    }
+
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
     
-    /* --- LAYOUT UTAMA DESKTOP & MOBILE --- */
-    html {
-        background-color: #111; /* Warna luar area HP di desktop */
-        min-height: 100vh;
+    /* --- LAYOUT SYSTEM UPDATE (DESKTOP VERSION) --- */
+    html, body {
+        height: 100%;
+        margin: 0;
+        /* overflow: hidden; dihapus agar scrollbar browser tetap ada jika layar kecil */
+        background-color: #111; /* Background Desktop Luar */
     }
 
     body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center; /* Posisi tengah di desktop */
-      min-height: 100vh;
-      background-color: #050505;
-      color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
     }
 
-    /* WADAH UTAMA (HP SIMULATOR) */
-    #main-app {
-      width: 100%;
-      max-width: var(--mobile-width);
-      /* UPDATE: Menggunakan gradasi linear seperti sebelumnya */
-      background: linear-gradient(180deg, var(--bg), #020305);
-      position: relative;
-      min-height: 100vh;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5);
-      overflow: hidden; /* Mencegah scroll bar ganda */
-      display: flex;
-      flex-direction: column;
+    /* Container Utama (Simulasi Layar HP) */
+    .app-container {
+        width: 100%;
+        max-width: var(--mobile-width);
+        height: 100%;
+        max-height: 100vh; /* Batasi tinggi agar fit di layar desktop */
+        background: linear-gradient(180deg, var(--bg), #020305);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        transition: background 0.3s;
+        overflow: hidden; /* Default hidden untuk simulasi app */
+    }
+
+    /* Override Background untuk Light Mode */
+    [data-theme="light"] .app-container {
+        background: var(--bg);
     }
 
     /* --- UTILS --- */
     .locked-image {
       width: 100%; display: block;
       pointer-events: none; user-select: none; -webkit-user-drag: none;
+      transition: filter 0.3s;
+    }
+    [data-theme="light"] .locked-image {
+       filter: invert(1) hue-rotate(180deg);
     }
     
-    /* --- LIST --- */
-    /* List mengisi sisa ruang agar footer terdorong ke bawah jika konten sedikit, 
-       tapi tetap bisa discroll jika konten banyak */
+    /* --- HEADER & FOOTER --- */
+    .topbar { 
+        position: absolute; 
+        top: 0; left: 0; right: 0; 
+        z-index: 10;
+        background: var(--bg); /* Fallback */
+        transition: background 0.3s;
+    }
+    
+    .bottom { 
+        position: absolute; 
+        bottom: 0; left: 0; right: 0; 
+        z-index: 10;
+        background: linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3)); 
+        pointer-events: none; 
+    }
+    .bottom img { pointer-events: none; }
+
+    /* --- CONTENT LIST (Internal Scrolling) --- */
     .list {
-      flex: 1; 
-      padding: 0 0 20px 0;
+        flex: 1; /* Mengisi ruang sisa antara header dan footer */
+        overflow-y: auto; /* Scroll terjadi DI SINI */
+        padding-top: 160px; /* Sesuaikan tinggi header */
+        padding-bottom: 100px; /* Sesuaikan tinggi footer */
+        
+        /* Hide Scrollbar untuk tampilan lebih bersih */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* IE 10+ */
+    }
+    .list::-webkit-scrollbar { 
+        width: 0px;
+        background: transparent; /* Chrome/Safari/Webkit */
     }
     
     .item{
@@ -80,6 +132,7 @@
       position: relative;
     }
     .item:active{background:rgba(255,255,255,0.03)}
+    [data-theme="light"] .item:active{background:rgba(0,0,0,0.05)}
     
     .avatar{
       width:50px;height:50px;border-radius:50%;flex:0 0 50px;overflow:hidden;
@@ -87,22 +140,21 @@
       display:flex;align-items:center;justify-content:center;
       font-weight:600; font-size: 20px; color: #fff;
       transition: background 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.05);
     }
+    [data-theme="light"] .avatar { border: none; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     .meta{
       flex:1; min-width:0;
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
-      border-bottom: 1px solid rgba(134, 150, 160, 0.15);
+      border-bottom: none; /* Garis dihapus */
     }
-    .item:last-child .meta { border-bottom: none; }
     
     .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-    
     .name{font-weight:500; font-size: 17px; color: var(--text-main);}
     .time{color:var(--muted); font-size:12px;}
-    
     .bot-row { display: flex; justify-content: space-between; align-items: center; }
     
     .preview{
@@ -115,72 +167,32 @@
       min-width:20px; height:20px; border-radius:10px;
       background:var(--badge-bg); 
       display:inline-flex; align-items:center; justify-content:center;
-      font-weight:700; color:#000; padding:0 6px; 
+      font-weight:700; color:var(--badge-text); padding:0 6px; 
       font-size: 11px; line-height: 1;
     }
 
     /* --- FAB (NEW CHAT) --- */
     .fab{
-      position: fixed; 
-      bottom: 80px; /* Diatur agar pas diatas navbar */
-      width: 130px; height: 130px;
+      position:absolute; 
+      bottom: 88px;
+      right: 20px; 
+      width: 80px; height: 80px; 
       background: transparent;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 10;
-      transition: transform 0.15s;
-      
-      /* Posisi FAB agar tetap di dalam container HP */
-      left: 50%; 
-      transform: translateX(-50%) translateX(130px); /* Geser ke kanan */
-      margin-left: -65px; /* Koreksi center */
+      display:flex; align-items:center; justify-content:center;
+      cursor: pointer; z-index: 15;
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
-    /* Media query untuk memastikan FAB menempel di container pada desktop */
-    @media (min-width: 481px) {
-       .fab {
-         left: 50%;
-         margin-left: 0;
-         /* Hitung posisi absolut relatif terhadap window center */
-         transform: translateX(100px); 
-       }
+    .fab img { 
+        width: 130px; 
+        max-width: none; 
+        pointer-events: none; 
+        transition: filter 0.3s; 
     }
-
-    .fab:active { transform: scale(0.92) translateX(100px); }
-    @media (max-width: 480px) {
-        .fab:active { transform: scale(0.92) translateX(-50%) translateX(130px); margin-left: -65px;}
-    }
-
-    .fab img { pointer-events: none; user-select: none; -webkit-user-drag: none; }
-
-    /* --- FIXED BARS (TOP & BOTTOM) --- */
-    .topbar { 
-        position: sticky; top: 0; 
-        z-index: 20; background: var(--bg);
-        width: 100%;
-    }
-    
-    .bottom { 
-        position: fixed; bottom: 0;
-        z-index: 20; 
-        width: 100%;
-        max-width: var(--mobile-width);
-        background: linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3)); 
-        pointer-events: none;
-    }
-    
-    /* Spacer agar konten tidak tertutup header */
-    /* Karena kita pakai Sticky, spacer top tidak terlalu krusial kecuali untuk visual overlap background */
-    .spacer-top { height: 0px; } 
-    
-    /* Spacer bawah agar konten list terakhir tidak tertutup navbar */
-    .spacer-bottom { height: 80px; } 
+    .fab:active { transform: scale(0.92); }
 
     /* --- MODAL SYSTEM --- */
     .modal-overlay {
-      position: fixed; top: 0; bottom: 0;
-      left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: var(--mobile-width);
-      
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6);
       display: flex; align-items: flex-end; 
       justify-content: center;
@@ -193,22 +205,28 @@
     
     .modal-container {
       background: var(--modal-bg);
-      width: 100%; max-width: 400px;
+      width: 100%;
       border-radius: 20px 20px 0 0; 
       padding: 24px 24px 40px 24px;
       box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      color: var(--text-main);
     }
-    .modal-overlay.open .modal-container { transform: translateY(0); opacity: 1; }
+    [data-theme="light"] .modal-container { box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
+    
+    .modal-overlay.open .modal-container {
+      transform: translateY(0);
+    }
 
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-title { font-size: 20px; font-weight: 600; color: var(--text-main); }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
+    
+    .header-actions { display: flex; align-items: center; gap: 8px; }
 
     .btn-close-icon { background:none; border:none; color:var(--muted); font-size:28px; cursor:pointer; line-height: 1; padding: 4px; }
     
-    .btn-header-dl {
+    .btn-header-icon {
       background: rgba(0, 168, 132, 0.15);
       border: none;
       color: var(--accent);
@@ -216,29 +234,30 @@
       width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
-    .btn-header-dl:active { background: rgba(0, 168, 132, 0.25); }
-    .btn-header-dl svg { width: 20px; height: 20px; fill: currentColor; }
+    .btn-header-icon:active { background: rgba(0, 168, 132, 0.25); transform: scale(0.95); }
+    .btn-header-icon svg { width: 20px; height: 20px; fill: currentColor; }
 
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 13px; color: var(--accent); margin-bottom: 6px; font-weight: 500; }
     
     .form-input {
       width: 100%; padding: 12px 14px;
-      background: #2a3942; 
+      background: var(--input-bg); 
       border: 1px solid transparent;
-      border-radius: 10px; color: #fff; font-size: 15px;
+      border-radius: 10px; color: var(--text-main); font-size: 15px;
       font-family: inherit; outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
     }
     .form-input:focus { border-color: var(--accent); }
 
     .row { display: flex; gap: 12px; }
     
+    /* Avatar Selector */
     .avatar-selector {
       display: flex; gap: 12px; align-items: center;
-      background: #2a3942; padding: 10px; border-radius: 12px;
+      background: var(--input-bg); padding: 10px; border-radius: 12px;
     }
     .avatar-preview-small {
       width: 40px; height: 40px; border-radius: 50%; background: #636e72;
@@ -250,6 +269,7 @@
       cursor: pointer; padding: 4px 8px;
     }
 
+    /* Action Buttons */
     .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
     .btn {
       flex: 1; padding: 14px; border: none; border-radius: 50px;
@@ -258,15 +278,15 @@
       transition: filter 0.2s;
     }
     .btn:active { filter: brightness(0.8); }
-    .btn-primary { background: var(--accent); color: #111b21; }
-    .btn-danger { background: transparent; color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-    .btn-danger:active { background: rgba(239,68,68,0.1); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    [data-theme="light"] .btn-primary { color: #fff; }
 
-    /* --- CONFIRMATION POPUP --- */
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); opacity: 0.7; }
+    .btn-danger:active { background: rgba(239,68,68,0.1); opacity: 1; }
+
+    /* --- CONFIRMATION POPUP (Custom) --- */
     .confirm-overlay {
-      position: fixed; top:0; height:100%;
-      left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: var(--mobile-width);
+      position: absolute; top:0; left:0; right:0; bottom:0;
       background: rgba(0,0,0,0.7); z-index: 200;
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
@@ -274,23 +294,24 @@
     .confirm-overlay.show { opacity: 1; pointer-events: auto; }
 
     .confirm-box {
-      background: #2a3942; width: 85%; max-width: 320px;
+      background: var(--modal-bg); width: 85%; max-width: 320px;
       border-radius: 18px; padding: 24px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       transform: scale(0.9); transition: transform 0.2s;
+      color: var(--text-main);
     }
     .confirm-overlay.show .confirm-box { transform: scale(1); }
 
-    .confirm-text { color: #d1d7db; font-size: 16px; margin-bottom: 24px; line-height: 1.5; }
+    .confirm-text { color: var(--text-main); font-size: 16px; margin-bottom: 24px; line-height: 1.5; }
     .confirm-buttons { display: flex; justify-content: flex-end; gap: 20px; }
     .c-btn { background: none; border: none; font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 12px; border-radius: 4px;}
     .c-btn-cancel { color: var(--accent); }
     .c-btn-ok { color: var(--accent); } 
-    .c-btn:active { background: rgba(255,255,255,0.05); }
+    .c-btn:active { background: rgba(100,100,100,0.1); }
 
-    /* --- TOAST --- */
+    /* --- TOAST NOTIFICATION --- */
     .toast {
-      position: fixed; bottom: 100px; 
+      position: absolute; bottom: 100px; 
       left: 50%; transform: translateX(-50%) translateY(20px);
       background: #333; color: white; padding: 12px 24px;
       border-radius: 50px; font-size: 14px;
@@ -302,9 +323,7 @@
     
     /* Loading Overlay */
     .loading-overlay {
-        position: fixed; top:0; height:100%;
-        left: 50%; transform: translateX(-50%);
-        width: 100%; max-width: var(--mobile-width);
+        position: absolute; top:0; left:0; right:0; bottom:0;
         background: rgba(0,0,0,0.8); z-index: 999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         color: #00a884; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -317,28 +336,33 @@
     }
     @keyframes spin { to {transform: rotate(360deg);} }
 
-    /* --- SCREENSHOT MODE HELPERS --- */
+    /* --- SCREENSHOT MODE HELPERS (Dari Code Kedua) --- */
     /* Class ini ditambahkan via JS saat screenshot berlangsung */
-    .screenshot-mode .bottom {
-        position: absolute !important; 
-        bottom: 0 !important;
-        left: 0 !important; right: 0 !important;
-        transform: none !important;
-    }
-    .screenshot-mode .fab { display: none !important; }
-    .screenshot-mode .topbar { position: relative !important; }
-    .screenshot-mode {
-        height: auto !important; 
-        min-height: auto !important;
+    .screenshot-mode.app-container {
+        height: auto !important;
+        max-height: none !important;
         overflow: visible !important;
+        background: var(--bg) !important; /* Pastikan bg solid */
     }
+
+    .screenshot-mode .bottom,
+    .screenshot-mode .topbar {
+        position: absolute !important; 
+        /* Tidak perlu fix bottom 0 karena kita akan capture full height */
+    }
+
+    .screenshot-mode .list {
+        overflow: visible !important;
+        height: auto !important;
+    }
+    
+    .screenshot-mode .fab { display: none !important; }
 
   </style>
 </head>
 <body>
-
-  <!-- WRAPPER UTAMA (HP) -->
-  <div id="main-app">
+  <!-- CONTAINER UTAMA (SIMULASI HP) -->
+  <div class="app-container" id="mainAppContainer">
 
       <!-- LOADING SCREENSHOT -->
       <div class="loading-overlay" id="loadingOverlay">
@@ -347,36 +371,39 @@
       </div>
 
       <div class="topbar">
-        <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" />
+        <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" crossorigin="anonymous" />
       </div>
-
-      <!-- Spacer top dihapus diganti margin list atau sticky -->
       
+      <!-- CONTENT AREA -->
       <div class="list" id="chatList"></div>
-      
-      <div class="spacer-bottom"></div>
 
+      <!-- FAB -->
       <div class="fab" title="Buat Chat Baru" onclick="openEditor()">
-        <img src="https://i.imghippo.com/files/rcIF1146eCY.png" draggable="false" alt="New Chat" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
+        <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="transform: translate(15px, 10px); width: 100%;" crossorigin="anonymous">
       </div>
 
       <div class="bottom">
-        <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" />
+        <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" crossorigin="anonymous" />
       </div>
 
-      <!-- MODAL & DIALOGS tetap di dalam Wrapper agar posisinya akurat -->
-      
       <!-- EDITOR MODAL -->
       <div class="modal-overlay" id="editorModal">
         <div class="modal-container">
           <div class="modal-header">
             <div class="modal-title" id="modalTitle">Edit Chat</div>
             <div class="header-actions">
-                <button class="btn-header-dl" title="Download Screenshot" onclick="downloadFromModal()">
+                <button class="btn-header-icon" title="Ganti Tema" onclick="toggleTheme()">
+                    <svg id="themeIcon" viewBox="0 0 24 24">
+                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                    </svg>
+                </button>
+
+                <button class="btn-header-icon" title="Download Screenshot" onclick="downloadFromModal()">
                     <svg viewBox="0 0 24 24">
                         <path d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"/>
                     </svg>
                 </button>
+                
                 <button class="btn-close-icon" onclick="closeEditor()">&times;</button>
             </div>
           </div>
@@ -437,11 +464,10 @@
 
       <!-- TOAST NOTIFICATION -->
       <div class="toast" id="toast">Notifikasi</div>
-      
-  </div> <!-- End #main-app -->
+
+  </div> <!-- END APP CONTAINER -->
 
   <script>
-    /* --- PALET WARNA AVATAR --- */
     const avatarColors = [
         '#00A884', '#FF5252', '#FF9800', '#3F51B5', '#2196F3', 
         '#9C27B0', '#00BCD4', '#4CAF50', '#795548', '#607D8B', '#E91E63'
@@ -451,7 +477,6 @@
         return avatarColors[Math.floor(Math.random() * avatarColors.length)];
     }
 
-    /* --- DATA --- */
     let chats = [
       {name:'Zahra', msg:'Ardi temenin aku dong di kost', time:'20.41', unread:13, avatar:'Z', isImage: false, color: getRandomColor()},
       {name:'Putri', msg:'Ardi ketemu yuk kita jalan bareng', time:'20.41', unread:1, avatar:'P', isImage: false, color: getRandomColor()},
@@ -459,8 +484,8 @@
     ];
     let editIdx = -1;
     let tempDraftColor = '';
+    let isLightMode = false;
 
-    /* --- ELEMENTS --- */
     const listEl = document.getElementById('chatList');
     const modal = document.getElementById('editorModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -477,22 +502,33 @@
     const confirmTextEl = document.getElementById('confirmText');
     const confirmOkBtn = document.getElementById('confirmOkBtn');
     const toastEl = document.getElementById('toast');
+    const themeIcon = document.getElementById('themeIcon');
+    const fabIcon = document.getElementById('fabIcon');
 
-    /* --- RENDER FUNCTION --- */
+    function toggleTheme() {
+        isLightMode = !isLightMode;
+        if(isLightMode) {
+            document.body.setAttribute('data-theme', 'light');
+            themeIcon.innerHTML = '<path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>';
+            fabIcon.src = "https://i.imghippo.com/files/NLt8463pM.png";
+        } else {
+            document.body.removeAttribute('data-theme');
+            themeIcon.innerHTML = '<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>';
+            fabIcon.src = "https://i.imghippo.com/files/toKE4058Rk.png";
+        }
+    }
+
     function render() {
       listEl.innerHTML = '';
       chats.forEach((c, idx) => {
         const el = document.createElement('div');
         el.className = 'item';
         el.onclick = () => openEditor(idx);
-
         let avatarContent = c.avatar;
         if(!c.color) c.color = getRandomColor();
-
         if(c.isImage) {
             avatarContent = `<img src="${c.avatar}" alt="img">`;
         }
-
         el.innerHTML = `
           <div class="avatar" style="background-color: ${c.color}">
             ${avatarContent}
@@ -512,21 +548,17 @@
       });
     }
 
-    /* --- EDITOR LOGIC --- */
     function openEditor(idx = -1) {
       editIdx = idx;
       inpAvatarFile.value = '';
-      
       if(idx === -1) {
         modalTitle.innerText = "Chat Baru";
         inpName.value = "";
         inpMsg.value = "";
-        
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         inpTime.value = `${hours}:${minutes}`;
-        
         inpUnread.value = 1;
         inpAvatarText.value = "";
         hiddenBase64.value = "";
@@ -542,7 +574,6 @@
         inpUnread.value = c.unread;
         btnDelete.style.display = "block";
         tempDraftColor = c.color;
-
         if(c.isImage) {
             hiddenBase64.value = c.avatar;
             inpAvatarText.value = "";
@@ -560,7 +591,6 @@
       modal.classList.remove('open');
     }
 
-    /* --- AVATAR HANDLING --- */
     inpAvatarText.addEventListener('input', (e) => {
         if(e.target.value) {
             hiddenBase64.value = "";
@@ -589,19 +619,16 @@
         }
     }
 
-    /* --- SAVE & DELETE --- */
     function saveChat() {
         const name = inpName.value || "Tanpa Nama";
         let finalAvatar = "A";
         let isImage = false;
-
         if(hiddenBase64.value) {
             finalAvatar = hiddenBase64.value;
             isImage = true;
         } else {
             finalAvatar = inpAvatarText.value.substring(0,2).toUpperCase() || name.charAt(0).toUpperCase();
         }
-
         const newObj = {
             name: name,
             msg: inpMsg.value,
@@ -611,13 +638,11 @@
             isImage: isImage,
             color: tempDraftColor
         };
-
         if(editIdx === -1) {
             chats.unshift(newObj);
         } else {
             chats[editIdx] = newObj;
         }
-
         render();
         closeEditor();
         showToast("Chat disimpan");
@@ -636,9 +661,7 @@
         }, 200);
     }
 
-    /* --- CONFIRM & TOAST --- */
     let onConfirmAction = null;
-
     function showConfirm(action, message) {
         onConfirmAction = action;
         confirmTextEl.innerText = message || "Konfirmasi?";
@@ -666,8 +689,7 @@
         }, 3000);
     }
 
-    /* --- SCREENSHOT LOGIC --- */
-    
+    // --- UPDATED SCREENSHOT LOGIC (DESKTOP VERSION DARI CODE KE-2) ---
     function downloadFromModal() {
         closeEditor();
         setTimeout(() => {
@@ -677,26 +699,47 @@
 
     function processScreenshot() {
         const loading = document.getElementById('loadingOverlay');
-        const appEl = document.getElementById('main-app'); // TARGET ELEMENT BARU
+        const appEl = document.getElementById('mainAppContainer'); // Container Utama
         
         loading.classList.add('show');
         window.scrollTo(0,0);
 
-        // 1. Aktifkan Mode Screenshot (Ubah Fixed jadi Absolute)
+        // 1. Aktifkan Mode Screenshot (Ubah Fixed jadi Absolute, Full Height)
         appEl.classList.add('screenshot-mode');
 
         setTimeout(() => {
+            let currentBg = isLightMode ? '#ffffff' : '#04070a';
+
             html2canvas(appEl, {
                 useCORS: true, 
                 allowTaint: true,
                 scale: 2, // Kualitas HD
-                backgroundColor: '#0b141a', // Warna Background WA
+                backgroundColor: currentBg,
                 // Pastikan capture sesuai ukuran container, bukan window browser
                 width: appEl.offsetWidth, 
                 height: appEl.scrollHeight, // Capture Full Height (Long Screenshot)
                 windowWidth: 480, // Paksa rendering mode mobile
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay' || element.classList.contains('modal-overlay');
+                },
+                onclone: (clonedDoc) => {
+                    // Tetap pertahankan logika Filter Light Mode dari Code 1
+                    if (isLightMode) {
+                        const images = clonedDoc.querySelectorAll('.locked-image');
+                        images.forEach(img => {
+                            // Reset filter agar tidak dobel saat dikonversi ke canvas
+                            img.style.filter = 'none';
+                            
+                            // Manual filter baking (karena html2canvas kadang gagal baca CSS filter)
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth || img.width; 
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.filter = 'invert(1) hue-rotate(180deg)';
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            img.src = canvas.toDataURL();
+                        });
+                    }
                 }
             }).then(canvas => {
                 // 2. Kembalikan Mode Normal
@@ -721,6 +764,5 @@
     // INIT
     render();
   </script>
-
 </body>
 </html>
