@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>WhatsApp Pro Creator 4K - Scrollable</title>
+  <title>WhatsApp Pro Creator 4K - Uranus Supreme</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Load Html2Canvas -->
@@ -79,6 +79,7 @@
         overflow: hidden; /* Clip elemen yang keluar */
         box-shadow: 0 0 50px rgba(0,0,0,0.5);
         transition: background 0.3s;
+        z-index: 10; /* Ensure app is above background ads */
     }
 
     /* Override Background untuk Light Mode */
@@ -169,10 +170,8 @@
       flex:1; min-width:0;
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
-      /* border-bottom: 1px solid rgba(134, 150, 160, 0.15); <-- INI YANG DIHAPUS */
       border-bottom: none; 
     }
-    /* [data-theme="light"] .meta { border-bottom: 1px solid rgba(0, 0, 0, 0.05); } <-- INI JUGA DIHAPUS/KOMENTAR */
     
     .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
     .name{font-weight:500; font-size: 17px; color: var(--text-main);}
@@ -358,9 +357,182 @@
     }
     @keyframes spin { to {transform: rotate(360deg);} }
 
+    /* ======================================================= */
+    /* === ADVERTISING SYSTEM STYLES (URANUS SUPREME ADS) === */
+    /* ======================================================= */
+
+    /* 1. Interstitial / Full Screen Ad */
+    .ad-interstitial-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 99999; /* Paling atas */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease-in-out;
+    }
+    .ad-interstitial-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .ad-interstitial-content {
+        position: relative;
+        width: 300px;
+        height: 250px;
+        background: #000;
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+        animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .ad-close-btn {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: transparent;
+        border: 2px solid #fff;
+        color: #fff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex; align-items: center; justify-content: center;
+        transition: transform 0.2s;
+    }
+    .ad-close-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
+    .ad-label {
+        position: absolute; bottom: -25px; left: 0; right: 0;
+        text-align: center; color: #555; font-size: 11px;
+    }
+
+    @keyframes popUp {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    /* 2. Sidebar Ads (Desktop Only - 160x600) */
+    .ad-sidebar {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 160px;
+        height: 600px;
+        z-index: 5;
+        display: none; /* Hidden on mobile */
+    }
+    .ad-left { left: 10px; }
+    .ad-right { right: 10px; }
+    
+    @media screen and (min-width: 850px) {
+        .ad-sidebar { display: block; }
+    }
+
+    /* 3. Sticky Bottom Ad (Mobile - 320x50) */
+    .ad-sticky-bottom {
+        position: fixed;
+        bottom: 0; left: 50%;
+        transform: translateX(-50%);
+        z-index: 300; /* Above toast but below alerts */
+        background: rgba(0,0,0,0.8);
+        padding: 5px;
+        border-radius: 8px 8px 0 0;
+        display: block;
+    }
+
+    /* 4. Native Ad Container (In-Feed) */
+    .ad-native-container {
+        padding: 10px;
+        background: rgba(255,255,255,0.03);
+        margin: 8px 0;
+        display: flex;
+        justify-content: center;
+        min-height: 100px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    [data-theme="light"] .ad-native-container {
+        background: rgba(0,0,0,0.03);
+        border-color: rgba(0,0,0,0.05);
+    }
   </style>
 </head>
 <body>
+
+  <!-- =========================== -->
+  <!-- 1. INTERSTITIAL AD OVERLAY -->
+  <!-- =========================== -->
+  <div class="ad-interstitial-overlay" id="interstitialAd">
+      <div class="ad-interstitial-content">
+          <button class="ad-close-btn" onclick="closeInterstitial()">X</button>
+          
+          <!-- 300x250 Ad Code -->
+          <script type="text/javascript">
+            atOptions = {
+                'key' : '76fe2d2bbd0c48aa43d4bea70f2473f2',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
+          </script>
+          <script type="text/javascript" src="//lightingshovestature.com/76fe2d2bbd0c48aa43d4bea70f2473f2/invoke.js"></script>
+          
+          <div class="ad-label">Iklan membantu kami tetap gratis</div>
+      </div>
+  </div>
+
+  <!-- =========================== -->
+  <!-- 2. SIDEBAR ADS (DESKTOP)   -->
+  <!-- =========================== -->
+  
+  <!-- Left Sidebar 160x600 -->
+  <div class="ad-sidebar ad-left">
+      <script type="text/javascript">
+        atOptions = {
+            'key' : 'eaedd1f5161104e04d378842c7366a03',
+            'format' : 'iframe',
+            'height' : 600,
+            'width' : 160,
+            'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/eaedd1f5161104e04d378842c7366a03/invoke.js"></script>
+  </div>
+
+  <!-- Right Sidebar 160x600 -->
+  <div class="ad-sidebar ad-right">
+      <script type="text/javascript">
+        atOptions = {
+            'key' : 'eaedd1f5161104e04d378842c7366a03',
+            'format' : 'iframe',
+            'height' : 600,
+            'width' : 160,
+            'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/eaedd1f5161104e04d378842c7366a03/invoke.js"></script>
+  </div>
+
+  <!-- =========================== -->
+  <!-- 3. MOBILE STICKY AD        -->
+  <!-- =========================== -->
+  <div class="ad-sticky-bottom">
+      <!-- 320x50 Ad Code -->
+      <script type="text/javascript">
+        atOptions = {
+            'key' : '5dbbc482ac3880c1423a2c9fd28551ef',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//lightingshovestature.com/5dbbc482ac3880c1423a2c9fd28551ef/invoke.js"></script>
+  </div>
+
+
   <!-- CONTAINER UTAMA (SIMULASI HP) -->
   <div class="app-container">
 
@@ -376,7 +548,7 @@
       
       <!-- CONTENT AREA (SCROLLABLE) -->
       <div class="list" id="chatList">
-          <!-- Chat items will be injected here -->
+          <!-- Chat items + Native Ads will be injected here -->
       </div>
 
       <!-- FAB -->
@@ -469,7 +641,38 @@
 
   </div> <!-- END APP CONTAINER -->
 
+  <!-- =========================== -->
+  <!-- 4. POPUNDER & SOCIAL BAR   -->
+  <!-- =========================== -->
+  
+  <!-- Popunder Script (Sync) -->
+  <script type='text/javascript' src='//lightingshovestature.com/83/2a/ad/832aad0d740bd161e2b53399f35f7a3d.js'></script>
+  
+  <!-- Social Bar Script (Sync) -->
+  <script type='text/javascript' src='//lightingshovestature.com/20/75/7d/20757db28340555c344f334d15d15e96.js'></script>
+
   <script>
+    // --- AD SYSTEM LOGIC ---
+    
+    // Interstitial Logic (Once per Session)
+    window.addEventListener('load', function() {
+        const hasSeenAd = sessionStorage.getItem('uranus_interstitial_shown');
+        if (!hasSeenAd) {
+            // Tampilkan iklan setelah delay kecil agar smooth
+            setTimeout(() => {
+                document.getElementById('interstitialAd').classList.add('show');
+            }, 1000);
+        }
+    });
+
+    function closeInterstitial() {
+        document.getElementById('interstitialAd').classList.remove('show');
+        // Set session agar tidak muncul lagi sampai browser ditutup
+        sessionStorage.setItem('uranus_interstitial_shown', 'true');
+    }
+
+    // --- APP LOGIC ---
+    
     const avatarColors = [
         '#00A884', '#FF5252', '#FF9800', '#3F51B5', '#2196F3', 
         '#9C27B0', '#00BCD4', '#4CAF50', '#795548', '#607D8B', '#E91E63'
@@ -531,9 +734,35 @@
         }
     }
 
+    // RENDER WITH NATIVE ADS INJECTION
     function render() {
       listEl.innerHTML = '';
+      
       chats.forEach((c, idx) => {
+        // --- NATIVE AD INJECTION ---
+        // Sisipkan iklan Native setelah item ke-3 (index 2)
+        if (idx === 3) {
+            const adDiv = document.createElement('div');
+            adDiv.className = 'ad-native-container';
+            
+            // Menggunakan container khusus untuk native script
+            // Note: Karena script native bersifat async dan mencari ID tertentu,
+            // kita recreate elemennya di sini.
+            adDiv.innerHTML = `
+                <div id="container-c2f8132d7d41185d319802ec69e49e18"></div>
+            `;
+            
+            // Inject script native secara manual agar tereksekusi saat render
+            const s = document.createElement('script');
+            s.async = true;
+            s.dataset.cfasync = "false";
+            s.src = "//lightingshovestature.com/c2f8132d7d41185d319802ec69e49e18/invoke.js";
+            adDiv.appendChild(s);
+            
+            listEl.appendChild(adDiv);
+        }
+        // ----------------------------
+
         const el = document.createElement('div');
         el.className = 'item';
         el.onclick = () => openEditor(idx);
@@ -713,13 +942,11 @@
         const loading = document.getElementById('loadingOverlay');
         loading.classList.add('show');
         const fab = document.querySelector('.fab');
+        // Sembunyikan elemen UI yang tidak perlu saat screenshot
         fab.style.display = 'none';
+        const adSticky = document.querySelector('.ad-sticky-bottom');
+        if(adSticky) adSticky.style.display = 'none';
         
-        // Scroll container to top
-        const list = document.querySelector('.list');
-        // Optional: Scroll to top before screenshot if needed
-        // list.scrollTop = 0; 
-
         const appContainer = document.querySelector('.app-container');
         
         setTimeout(() => {
@@ -737,6 +964,13 @@
                     return element.id === 'loadingOverlay';
                 },
                 onclone: (clonedDoc) => {
+                    // Reset overflow agar list full terlihat
+                    const clonedList = clonedDoc.getElementById('chatList');
+                    if(clonedList) {
+                        clonedList.style.overflow = 'visible'; 
+                    }
+                    
+                    // Invert image fix for dark mode screenshots
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
                         images.forEach(img => {
@@ -750,23 +984,23 @@
                             img.style.filter = 'none'; 
                         });
                     }
-                    // Memastikan scrollbar tidak ikut terfoto (walaupun sudah di-hide di CSS)
-                    const clonedList = clonedDoc.getElementById('chatList');
-                    if(clonedList) {
-                        clonedList.style.overflow = 'visible'; 
-                    }
                 }
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'WA-Mock-Scroll-' + Date.now() + '.png';
                 link.href = canvas.toDataURL("image/png", 1.0);
                 link.click();
+                
+                // Kembalikan UI
                 fab.style.display = 'flex';
+                if(adSticky) adSticky.style.display = 'block';
+                
                 loading.classList.remove('show');
                 showToast("Screenshot 4K berhasil disimpan!");
             }).catch(err => {
                 console.error(err);
                 fab.style.display = 'flex';
+                if(adSticky) adSticky.style.display = 'block';
                 loading.classList.remove('show');
                 showToast("Gagal membuat screenshot");
             });
