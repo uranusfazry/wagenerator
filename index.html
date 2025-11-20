@@ -169,9 +169,10 @@
       flex:1; min-width:0;
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
-      border-bottom: 1px solid rgba(134, 150, 160, 0.15); /* Garis pemisah tipis */
+      /* border-bottom: 1px solid rgba(134, 150, 160, 0.15); <-- INI YANG DIHAPUS */
+      border-bottom: none; 
     }
-    [data-theme="light"] .meta { border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+    /* [data-theme="light"] .meta { border-bottom: 1px solid rgba(0, 0, 0, 0.05); } <-- INI JUGA DIHAPUS/KOMENTAR */
     
     .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
     .name{font-weight:500; font-size: 17px; color: var(--text-main);}
@@ -195,7 +196,7 @@
     /* --- FAB (NEW CHAT) --- */
     .fab{
       position:absolute; 
-      bottom: 130px;
+      bottom: 120px;
       right: 20px; 
       width: 80px; height: 80px; 
       background: transparent;
