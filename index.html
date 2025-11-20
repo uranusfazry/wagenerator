@@ -658,7 +658,11 @@
                 allowTaint: true,
                 backgroundColor: '#04070a', 
                 windowWidth: document.documentElement.clientWidth,
-                windowHeight: document.documentElement.clientHeight
+                windowHeight: document.documentElement.clientHeight,
+                // FIX: Abaikan elemen loading overlay saat screenshot diambil
+                ignoreElements: (element) => {
+                    return element.id === 'loadingOverlay';
+                }
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'WA-Mock-' + Date.now() + '.png';
