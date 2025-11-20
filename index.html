@@ -431,14 +431,22 @@
 
     /* 3. Sticky Bottom Ad (Mobile - 320x50) */
     .ad-sticky-bottom {
-        position: fixed;
-        bottom: 0; left: 50%;
-        transform: translateX(-50%);
-        z-index: 300; /* Above toast but below alerts */
-        background: rgba(0,0,0,0.8);
-        padding: 5px;
-        border-radius: 8px 8px 0 0;
-        display: block;
+        position: absolute; /* Changed to ABSOLUTE to stick inside container */
+        bottom: 0; 
+        left: 0; 
+        right: 0;
+        z-index: 80; /* Above footer image (20) but below modal (100) */
+        background: rgba(0,0,0,0.85);
+        padding: 6px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: auto;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    [data-theme="light"] .ad-sticky-bottom {
+        background: rgba(240,242,245, 0.9);
+        border-color: rgba(0,0,0,0.1);
     }
 
     /* 4. Native Ad Container (In-Feed) */
@@ -515,23 +523,6 @@
       <script type="text/javascript" src="//lightingshovestature.com/eaedd1f5161104e04d378842c7366a03/invoke.js"></script>
   </div>
 
-  <!-- =========================== -->
-  <!-- 3. MOBILE STICKY AD        -->
-  <!-- =========================== -->
-  <div class="ad-sticky-bottom">
-      <!-- 320x50 Ad Code -->
-      <script type="text/javascript">
-        atOptions = {
-            'key' : '5dbbc482ac3880c1423a2c9fd28551ef',
-            'format' : 'iframe',
-            'height' : 50,
-            'width' : 320,
-            'params' : {}
-        };
-      </script>
-      <script type="text/javascript" src="//lightingshovestature.com/5dbbc482ac3880c1423a2c9fd28551ef/invoke.js"></script>
-  </div>
-
 
   <!-- CONTAINER UTAMA (SIMULASI HP) -->
   <div class="app-container">
@@ -558,6 +549,23 @@
 
       <div class="bottom">
         <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" crossorigin="anonymous" />
+      </div>
+
+      <!-- =========================== -->
+      <!-- 3. MOBILE STICKY AD (INSIDE CONTAINER) -->
+      <!-- =========================== -->
+      <div class="ad-sticky-bottom">
+          <!-- 320x50 Ad Code -->
+          <script type="text/javascript">
+            atOptions = {
+                'key' : '5dbbc482ac3880c1423a2c9fd28551ef',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+          </script>
+          <script type="text/javascript" src="//lightingshovestature.com/5dbbc482ac3880c1423a2c9fd28551ef/invoke.js"></script>
       </div>
 
       <!-- EDITOR MODAL -->
@@ -738,31 +746,8 @@
     function render() {
       listEl.innerHTML = '';
       
+      // 1. Render Semua Chat Terlebih Dahulu
       chats.forEach((c, idx) => {
-        // --- NATIVE AD INJECTION ---
-        // Sisipkan iklan Native setelah item ke-3 (index 2)
-        if (idx === 3) {
-            const adDiv = document.createElement('div');
-            adDiv.className = 'ad-native-container';
-            
-            // Menggunakan container khusus untuk native script
-            // Note: Karena script native bersifat async dan mencari ID tertentu,
-            // kita recreate elemennya di sini.
-            adDiv.innerHTML = `
-                <div id="container-c2f8132d7d41185d319802ec69e49e18"></div>
-            `;
-            
-            // Inject script native secara manual agar tereksekusi saat render
-            const s = document.createElement('script');
-            s.async = true;
-            s.dataset.cfasync = "false";
-            s.src = "//lightingshovestature.com/c2f8132d7d41185d319802ec69e49e18/invoke.js";
-            adDiv.appendChild(s);
-            
-            listEl.appendChild(adDiv);
-        }
-        // ----------------------------
-
         const el = document.createElement('div');
         el.className = 'item';
         el.onclick = () => openEditor(idx);
@@ -788,6 +773,25 @@
         `;
         listEl.appendChild(el);
       });
+
+      // 2. INJECT NATIVE AD PALING BAWAH (SETELAH SEMUA CHAT)
+      const adDiv = document.createElement('div');
+      adDiv.className = 'ad-native-container';
+      
+      // Menggunakan container khusus untuk native script
+      adDiv.innerHTML = `
+          <div id="container-c2f8132d7d41185d319802ec69e49e18"></div>
+      `;
+      
+      // Inject script native secara manual agar tereksekusi saat render
+      const s = document.createElement('script');
+      s.async = true;
+      s.dataset.cfasync = "false";
+      s.src = "//lightingshovestature.com/c2f8132d7d41185d319802ec69e49e18/invoke.js";
+      adDiv.appendChild(s);
+      
+      listEl.appendChild(adDiv);
+      // ----------------------------
     }
 
     function openEditor(idx = -1) {
