@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>WhatsApp Pro Creator</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,19 +44,14 @@
 
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
     
-    /* --- LAYOUT SYSTEM UPDATE (DESKTOP VERSION) --- */
+    /* --- DESKTOP SIMULATOR LAYOUT --- */
     html, body {
         height: 100%;
         margin: 0;
-        /* overflow: hidden; dihapus agar scrollbar browser tetap ada jika layar kecil */
         background-color: #111; /* Background Desktop Luar */
-    }
-
-    body {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
     }
 
     /* Container Utama (Simulasi Layar HP) */
@@ -65,14 +59,14 @@
         width: 100%;
         max-width: var(--mobile-width);
         height: 100%;
-        max-height: 100vh; /* Batasi tinggi agar fit di layar desktop */
+        max-height: 100vh; /* Batasi tinggi sesuai layar */
         background: linear-gradient(180deg, var(--bg), #020305);
         position: relative;
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 50px rgba(0,0,0,0.5);
         transition: background 0.3s;
-        overflow: hidden; /* Default hidden untuk simulasi app */
+        overflow: hidden; /* Default overflow hidden */
     }
 
     /* Override Background untuk Light Mode */
@@ -95,7 +89,7 @@
         position: absolute; 
         top: 0; left: 0; right: 0; 
         z-index: 10;
-        background: var(--bg); /* Fallback */
+        background: var(--bg); 
         transition: background 0.3s;
     }
     
@@ -110,19 +104,16 @@
 
     /* --- CONTENT LIST (Internal Scrolling) --- */
     .list {
-        flex: 1; /* Mengisi ruang sisa antara header dan footer */
-        overflow-y: auto; /* Scroll terjadi DI SINI */
-        padding-top: 160px; /* Sesuaikan tinggi header */
-        padding-bottom: 100px; /* Sesuaikan tinggi footer */
+        flex: 1; 
+        overflow-y: auto; /* Scroll normal */
+        padding-top: 160px; /* Tinggi Header */
+        padding-bottom: 100px; /* Tinggi Footer */
         
-        /* Hide Scrollbar untuk tampilan lebih bersih */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none;  /* IE 10+ */
+        /* Hide Scrollbar */
+        scrollbar-width: none; 
+        -ms-overflow-style: none;  
     }
-    .list::-webkit-scrollbar { 
-        width: 0px;
-        background: transparent; /* Chrome/Safari/Webkit */
-    }
+    .list::-webkit-scrollbar { width: 0px; background: transparent; }
     
     .item{
       display:flex; align-items:center; gap:14px;
@@ -149,7 +140,7 @@
       flex:1; min-width:0;
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
-      border-bottom: none; /* Garis dihapus */
+      border-bottom: none;
     }
     
     .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
@@ -254,7 +245,6 @@
 
     .row { display: flex; gap: 12px; }
     
-    /* Avatar Selector */
     .avatar-selector {
       display: flex; gap: 12px; align-items: center;
       background: var(--input-bg); padding: 10px; border-radius: 12px;
@@ -269,7 +259,6 @@
       cursor: pointer; padding: 4px 8px;
     }
 
-    /* Action Buttons */
     .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
     .btn {
       flex: 1; padding: 14px; border: none; border-radius: 50px;
@@ -284,7 +273,7 @@
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); opacity: 0.7; }
     .btn-danger:active { background: rgba(239,68,68,0.1); opacity: 1; }
 
-    /* --- CONFIRMATION POPUP (Custom) --- */
+    /* --- CONFIRMATION & TOAST --- */
     .confirm-overlay {
       position: absolute; top:0; left:0; right:0; bottom:0;
       background: rgba(0,0,0,0.7); z-index: 200;
@@ -309,7 +298,6 @@
     .c-btn-ok { color: var(--accent); } 
     .c-btn:active { background: rgba(100,100,100,0.1); }
 
-    /* --- TOAST NOTIFICATION --- */
     .toast {
       position: absolute; bottom: 100px; 
       left: 50%; transform: translateX(-50%) translateY(20px);
@@ -321,7 +309,6 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     
-    /* Loading Overlay */
     .loading-overlay {
         position: absolute; top:0; left:0; right:0; bottom:0;
         background: rgba(0,0,0,0.8); z-index: 999;
@@ -336,33 +323,41 @@
     }
     @keyframes spin { to {transform: rotate(360deg);} }
 
-    /* --- SCREENSHOT MODE HELPERS (Dari Code Kedua) --- */
-    /* Class ini ditambahkan via JS saat screenshot berlangsung */
-    .screenshot-mode.app-container {
+    /* --- SCREENSHOT HELPER CLASSES --- */
+    /* Class ini di-inject saat screenshot untuk memaksa layout memanjang (Long SS) */
+    .screenshot-mode {
         height: auto !important;
         max-height: none !important;
         overflow: visible !important;
-        background: var(--bg) !important; /* Pastikan bg solid */
+        display: block !important; /* Override flex */
     }
-
-    .screenshot-mode .bottom,
-    .screenshot-mode .topbar {
-        position: absolute !important; 
-        /* Tidak perlu fix bottom 0 karena kita akan capture full height */
-    }
-
     .screenshot-mode .list {
         overflow: visible !important;
         height: auto !important;
     }
-    
-    .screenshot-mode .fab { display: none !important; }
+    .screenshot-mode .fab,
+    .screenshot-mode .modal-overlay,
+    .screenshot-mode .loading-overlay {
+        display: none !important;
+    }
+    .screenshot-mode .topbar {
+        position: absolute; /* Tetap di atas */
+    }
+    .screenshot-mode .bottom {
+        position: absolute; 
+        bottom: 0;
+        /* Memastikan footer ada di paling bawah konten yang memanjang */
+        top: auto; 
+    }
+    /* Sembunyikan scrollbar browser saat mode screenshot */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
   </style>
 </head>
 <body>
   <!-- CONTAINER UTAMA (SIMULASI HP) -->
-  <div class="app-container" id="mainAppContainer">
+  <div class="app-container" id="appContainer">
 
       <!-- LOADING SCREENSHOT -->
       <div class="loading-overlay" id="loadingOverlay">
@@ -689,7 +684,7 @@
         }, 3000);
     }
 
-    // --- UPDATED SCREENSHOT LOGIC (DESKTOP VERSION DARI CODE KE-2) ---
+    // --- NEW SCREENSHOT LOGIC (ADAPTED FROM CODE 2) ---
     function downloadFromModal() {
         closeEditor();
         setTimeout(() => {
@@ -699,66 +694,72 @@
 
     function processScreenshot() {
         const loading = document.getElementById('loadingOverlay');
-        const appEl = document.getElementById('mainAppContainer'); // Container Utama
+        const appContainer = document.getElementById('appContainer');
         
         loading.classList.add('show');
-        window.scrollTo(0,0);
-
-        // 1. Aktifkan Mode Screenshot (Ubah Fixed jadi Absolute, Full Height)
-        appEl.classList.add('screenshot-mode');
+        
+        // 1. Persiapkan Element: Scroll ke atas & Tambahkan Class Mode Screenshot
+        // Class ini akan membuat container memanjang (height: auto) dan posisi footer absolut di bawah konten
+        listEl.scrollTo(0,0);
+        appContainer.classList.add('screenshot-mode');
+        document.body.classList.add('hide-scrollbar');
 
         setTimeout(() => {
+            // Tentukan warna background saat screenshot
             let currentBg = isLightMode ? '#ffffff' : '#04070a';
+            
+            // Gunakan scrollHeight agar seluruh konten ter-capture (Long Screenshot)
+            const fullHeight = appContainer.scrollHeight;
+            const fullWidth = appContainer.offsetWidth;
 
-            html2canvas(appEl, {
+            html2canvas(appContainer, {
                 useCORS: true, 
                 allowTaint: true,
-                scale: 2, // Kualitas HD
                 backgroundColor: currentBg,
-                // Pastikan capture sesuai ukuran container, bukan window browser
-                width: appEl.offsetWidth, 
-                height: appEl.scrollHeight, // Capture Full Height (Long Screenshot)
-                windowWidth: 480, // Paksa rendering mode mobile
+                width: fullWidth,
+                height: fullHeight, // Paksa tinggi sesuai konten chat
+                windowHeight: fullHeight, // Render virtual window setinggi konten
+                scale: 2, // Kualitas HD
                 ignoreElements: (element) => {
-                    return element.id === 'loadingOverlay' || element.classList.contains('modal-overlay');
+                    return element.id === 'loadingOverlay' || element.id === 'editorModal' || element.id === 'confirmModal';
                 },
                 onclone: (clonedDoc) => {
-                    // Tetap pertahankan logika Filter Light Mode dari Code 1
+                    // Fix khusus Light Mode: Kembalikan invert pada gambar yang dikunci
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
                         images.forEach(img => {
-                            // Reset filter agar tidak dobel saat dikonversi ke canvas
-                            img.style.filter = 'none';
-                            
-                            // Manual filter baking (karena html2canvas kadang gagal baca CSS filter)
                             const canvas = document.createElement('canvas');
                             canvas.width = img.naturalWidth || img.width; 
                             canvas.height = img.naturalHeight || img.height;
                             const ctx = canvas.getContext('2d');
+                            // Re-apply filter manual ke canvas
                             ctx.filter = 'invert(1) hue-rotate(180deg)';
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                             img.src = canvas.toDataURL();
+                            img.style.filter = 'none'; 
                         });
                     }
                 }
             }).then(canvas => {
-                // 2. Kembalikan Mode Normal
-                appEl.classList.remove('screenshot-mode');
-                
+                // Download Image
                 const link = document.createElement('a');
-                link.download = 'WA-Chat-' + Date.now() + '.png';
+                link.download = 'WA-Mock-' + Date.now() + '.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
-
+                
+                // Cleanup
+                appContainer.classList.remove('screenshot-mode');
+                document.body.classList.remove('hide-scrollbar');
                 loading.classList.remove('show');
                 showToast("Screenshot berhasil disimpan!");
             }).catch(err => {
-                appEl.classList.remove('screenshot-mode');
                 console.error(err);
+                appContainer.classList.remove('screenshot-mode');
+                document.body.classList.remove('hide-scrollbar');
                 loading.classList.remove('show');
                 showToast("Gagal membuat screenshot");
             });
-        }, 800); // Delay sedikit lebih lama untuk layout reflow
+        }, 800); // Delay sedikit agar DOM sempat repaint layout baru
     }
 
     // INIT
