@@ -679,10 +679,13 @@
         const fab = document.querySelector('.fab');
         fab.style.display = 'none';
         
-        // Scroll container to top
         const appContainer = document.querySelector('.app-container');
         
-        // Use html2canvas on the App Container only
+        // FIX: Ambil dimensi asli container HP
+        // Ini memastikan screenshot TIDAK meluber meskipun chat list panjang
+        const targetWidth = appContainer.clientWidth;
+        const targetHeight = appContainer.clientHeight;
+
         setTimeout(() => {
             let currentBg = isLightMode ? '#ffffff' : '#04070a';
             
@@ -690,11 +693,16 @@
                 useCORS: true, 
                 allowTaint: true,
                 backgroundColor: currentBg,
+                scale: 2, // HD Quality
+                width: targetWidth,   // PAKSA LEBAR SESUAI CONTAINER HP
+                height: targetHeight, // PAKSA TINGGI SESUAI CONTAINER HP (CROP OVERFLOW)
+                windowWidth: targetWidth,
+                windowHeight: targetHeight,
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay';
                 },
-                // FIX: Baking filter manually for light mode screenshot
                 onclone: (clonedDoc) => {
+                    // Fix untuk light mode gambar invert
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
                         images.forEach(img => {
@@ -708,6 +716,10 @@
                             img.style.filter = 'none'; 
                         });
                     }
+                    
+                    // Pastikan scroll list di reset di kloningan agar capture dari atas
+                    const clonedList = clonedDoc.getElementById('chatList');
+                    if(clonedList) clonedList.scrollTop = 0;
                 }
             }).then(canvas => {
                 const link = document.createElement('a');
