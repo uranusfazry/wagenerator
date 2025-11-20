@@ -56,7 +56,6 @@
 
     body{
       margin:0;
-      /* Default Dark Mode Gradient */
       background: linear-gradient(180deg, var(--bg), #020305);
       color:var(--text-main);
       user-select: none; 
@@ -65,15 +64,13 @@
       overflow-x: hidden;
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
-      
-      /* KUNCI: Memaksa lebar body seperti HP */
       width: 100%;
       max-width: var(--mobile-width);
       position: relative;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Bayangan agar terlihat seperti device */
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
     }
 
-    /* Override Background untuk Light Mode agar solid (tidak gradasi hitam) */
+    /* Override Background untuk Light Mode */
     body[data-theme="light"] {
         background: var(--bg);
     }
@@ -84,7 +81,7 @@
       pointer-events: none; user-select: none; -webkit-user-drag: none;
       transition: filter 0.3s;
     }
-    /* Filter invert untuk light mode pada gambar header (Top Bar & Bottom Bar) */
+    /* Filter CSS untuk tampilan layar (browser) */
     [data-theme="light"] .locked-image {
        filter: invert(1) hue-rotate(180deg);
     }
@@ -151,8 +148,6 @@
       display:flex; align-items:center; justify-content:center;
       cursor: pointer; z-index: 10;
       transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-      /* Posisi Relatif terhadap area mobile */
       left: 50%; 
       right: auto;
       margin-left: 90px; 
@@ -185,7 +180,6 @@
       position: fixed; top: 0; bottom: 0;
       left: 50%; transform: translateX(-50%);
       width: 100%; max-width: var(--mobile-width);
-      
       background: rgba(0,0,0,0.6);
       display: flex; align-items: flex-end; 
       justify-content: center;
@@ -220,7 +214,6 @@
 
     .btn-close-icon { background:none; border:none; color:var(--muted); font-size:28px; cursor:pointer; line-height: 1; padding: 4px; }
     
-    /* Button Header (Theme & Download) */
     .btn-header-icon {
       background: rgba(0, 168, 132, 0.15);
       border: none;
@@ -282,10 +275,8 @@
     /* --- CONFIRMATION POPUP (Custom) --- */
     .confirm-overlay {
       position: fixed; top:0; height:100%;
-      /* Fix posisi overlay di tengah */
       left: 50%; transform: translateX(-50%);
       width: 100%; max-width: var(--mobile-width);
-      
       background: rgba(0,0,0,0.7); z-index: 200;
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
@@ -311,9 +302,7 @@
     /* --- TOAST NOTIFICATION --- */
     .toast {
       position: fixed; bottom: 100px; 
-      /* Toast tetap di tengah area mobile */
       left: 50%; transform: translateX(-50%) translateY(20px);
-      
       background: #333; color: white; padding: 12px 24px;
       border-radius: 50px; font-size: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -322,13 +311,11 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     
-    /* Loading Overlay for Screenshot */
+    /* Loading Overlay */
     .loading-overlay {
         position: fixed; top:0; height:100%;
-        /* Fix overlay loading */
         left: 50%; transform: translateX(-50%);
         width: 100%; max-width: var(--mobile-width);
-        
         background: rgba(0,0,0,0.8); z-index: 999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         color: #00a884; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -345,26 +332,24 @@
 </head>
 <body>
 
-  <!-- LOADING SCREENSHOT -->
   <div class="loading-overlay" id="loadingOverlay">
       <div class="spinner"></div>
       <div>Memproses Gambar...</div>
   </div>
 
   <div class="topbar">
-    <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" />
+    <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" crossorigin="anonymous" />
   </div>
   <div class="spacer-top"></div>
 
   <div class="list" id="chatList"></div>
 
   <div class="fab" title="Buat Chat Baru" onclick="openEditor()">
-    <!-- FAB Icon -->
-    <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
+    <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));" crossorigin="anonymous">
   </div>
 
   <div class="bottom">
-    <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" />
+    <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" crossorigin="anonymous" />
   </div>
 
   <!-- EDITOR MODAL -->
@@ -373,14 +358,12 @@
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Edit Chat</div>
         <div class="header-actions">
-            <!-- Theme Switcher -->
             <button class="btn-header-icon" title="Ganti Tema" onclick="toggleTheme()">
                 <svg id="themeIcon" viewBox="0 0 24 24">
                     <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
                 </svg>
             </button>
 
-            <!-- Download Button -->
             <button class="btn-header-icon" title="Download Screenshot" onclick="downloadFromModal()">
                 <svg viewBox="0 0 24 24">
                     <path d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"/>
@@ -449,7 +432,6 @@
   <div class="toast" id="toast">Notifikasi</div>
 
   <script>
-    /* --- PALET WARNA AVATAR --- */
     const avatarColors = [
         '#00A884', '#FF5252', '#FF9800', '#3F51B5', '#2196F3', 
         '#9C27B0', '#00BCD4', '#4CAF50', '#795548', '#607D8B', '#E91E63'
@@ -459,7 +441,6 @@
         return avatarColors[Math.floor(Math.random() * avatarColors.length)];
     }
 
-    /* --- DATA --- */
     let chats = [
       {name:'Zahra', msg:'Ardi temenin aku dong di kost', time:'20.41', unread:13, avatar:'Z', isImage: false, color: getRandomColor()},
       {name:'Putri', msg:'Ardi ketemu yuk kita jalan bareng', time:'20.41', unread:1, avatar:'P', isImage: false, color: getRandomColor()},
@@ -469,7 +450,6 @@
     let tempDraftColor = '';
     let isLightMode = false;
 
-    /* --- ELEMENTS --- */
     const listEl = document.getElementById('chatList');
     const modal = document.getElementById('editorModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -487,45 +467,32 @@
     const confirmOkBtn = document.getElementById('confirmOkBtn');
     const toastEl = document.getElementById('toast');
     const themeIcon = document.getElementById('themeIcon');
-    
-    // Reference ke elemen gambar FAB
     const fabIcon = document.getElementById('fabIcon');
 
-    /* --- THEME LOGIC --- */
     function toggleTheme() {
         isLightMode = !isLightMode;
         if(isLightMode) {
             document.body.setAttribute('data-theme', 'light');
-            // Icon Sun
             themeIcon.innerHTML = '<path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>';
-            
-            // Ganti gambar FAB ke versi Light
             fabIcon.src = "https://i.imghippo.com/files/NLt8463pM.png";
         } else {
             document.body.removeAttribute('data-theme');
-            // Icon Moon
             themeIcon.innerHTML = '<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>';
-            
-            // Ganti gambar FAB ke versi Dark (DEFAULT) - Menggunakan URL baru
             fabIcon.src = "https://i.imghippo.com/files/toKE4058Rk.png";
         }
     }
 
-    /* --- RENDER FUNCTION --- */
     function render() {
       listEl.innerHTML = '';
       chats.forEach((c, idx) => {
         const el = document.createElement('div');
         el.className = 'item';
         el.onclick = () => openEditor(idx);
-
         let avatarContent = c.avatar;
         if(!c.color) c.color = getRandomColor();
-
         if(c.isImage) {
             avatarContent = `<img src="${c.avatar}" alt="img">`;
         }
-
         el.innerHTML = `
           <div class="avatar" style="background-color: ${c.color}">
             ${avatarContent}
@@ -545,21 +512,17 @@
       });
     }
 
-    /* --- EDITOR LOGIC --- */
     function openEditor(idx = -1) {
       editIdx = idx;
       inpAvatarFile.value = '';
-      
       if(idx === -1) {
         modalTitle.innerText = "Chat Baru";
         inpName.value = "";
         inpMsg.value = "";
-        
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         inpTime.value = `${hours}:${minutes}`;
-        
         inpUnread.value = 1;
         inpAvatarText.value = "";
         hiddenBase64.value = "";
@@ -575,7 +538,6 @@
         inpUnread.value = c.unread;
         btnDelete.style.display = "block";
         tempDraftColor = c.color;
-
         if(c.isImage) {
             hiddenBase64.value = c.avatar;
             inpAvatarText.value = "";
@@ -593,7 +555,6 @@
       modal.classList.remove('open');
     }
 
-    /* --- AVATAR HANDLING --- */
     inpAvatarText.addEventListener('input', (e) => {
         if(e.target.value) {
             hiddenBase64.value = "";
@@ -622,19 +583,16 @@
         }
     }
 
-    /* --- SAVE & DELETE --- */
     function saveChat() {
         const name = inpName.value || "Tanpa Nama";
         let finalAvatar = "A";
         let isImage = false;
-
         if(hiddenBase64.value) {
             finalAvatar = hiddenBase64.value;
             isImage = true;
         } else {
             finalAvatar = inpAvatarText.value.substring(0,2).toUpperCase() || name.charAt(0).toUpperCase();
         }
-
         const newObj = {
             name: name,
             msg: inpMsg.value,
@@ -644,13 +602,11 @@
             isImage: isImage,
             color: tempDraftColor
         };
-
         if(editIdx === -1) {
             chats.unshift(newObj);
         } else {
             chats[editIdx] = newObj;
         }
-
         render();
         closeEditor();
         showToast("Chat disimpan");
@@ -669,9 +625,7 @@
         }, 200);
     }
 
-    /* --- CONFIRM & TOAST --- */
     let onConfirmAction = null;
-
     function showConfirm(action, message) {
         onConfirmAction = action;
         confirmTextEl.innerText = message || "Konfirmasi?";
@@ -699,7 +653,6 @@
         }, 3000);
     }
 
-    /* --- SCREENSHOT LOGIC (FROM MODAL) --- */
     function downloadFromModal() {
         closeEditor();
         setTimeout(() => {
@@ -710,21 +663,13 @@
     function processScreenshot() {
         const loading = document.getElementById('loadingOverlay');
         loading.classList.add('show');
-
         const fab = document.querySelector('.fab');
         fab.style.display = 'none';
-
         window.scrollTo(0,0);
 
         setTimeout(() => {
-            // Background menyesuaikan tema
-            // Jika dark mode, kita biarkan null agar html2canvas menangkap gradient CSS body
-            // Jika light mode, kita set putih solid
-            let currentBg = isLightMode ? '#ffffff' : null;
+            let currentBg = isLightMode ? '#ffffff' : '#04070a';
             
-            // Fallback untuk dark mode jika gradient tidak ter-capture dengan baik di beberapa browser
-            if(!isLightMode) currentBg = '#04070a';
-
             html2canvas(document.body, {
                 useCORS: true, 
                 allowTaint: true,
@@ -733,13 +678,35 @@
                 windowHeight: document.documentElement.clientHeight,
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay';
+                },
+                // FIX: Baking filter manually for light mode screenshot
+                onclone: (clonedDoc) => {
+                    if (isLightMode) {
+                        const images = clonedDoc.querySelectorAll('.locked-image');
+                        images.forEach(img => {
+                            // Create temp canvas to bake filter
+                            const canvas = document.createElement('canvas');
+                            // Using natural dimensions ensures high quality bake
+                            canvas.width = img.naturalWidth || img.width; 
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d');
+                            
+                            // Apply filter in canvas context
+                            ctx.filter = 'invert(1) hue-rotate(180deg)';
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
+                            // Replace img src with baked canvas
+                            img.src = canvas.toDataURL();
+                            // Remove CSS filter to avoid double inversion
+                            img.style.filter = 'none'; 
+                        });
+                    }
                 }
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'WA-Mock-' + Date.now() + '.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
-
                 fab.style.display = 'flex';
                 loading.classList.remove('show');
                 showToast("Screenshot berhasil disimpan!");
@@ -755,6 +722,5 @@
     // INIT
     render();
   </script>
-
 </body>
 </html>
