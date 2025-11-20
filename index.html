@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <!-- Viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>WhatsApp Pro Creator</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +24,8 @@
       --badge-text: #000;
       
       font-family: 'Inter', system-ui, sans-serif;
+      
+      /* Variabel untuk lebar maksimal tampilan mobile */
       --mobile-width: 480px; 
     }
 
@@ -45,36 +46,32 @@
 
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
     
-    /* --- LAYOUT SYSTEM UPDATE --- */
-    html, body {
-        height: 100%;
-        margin: 0;
-        overflow: hidden; /* Mencegah scroll pada body browser */
-        background-color: #111; /* Background Desktop Luar */
-    }
-
-    body {
+    /* --- FORCE MOBILE LAYOUT ON DESKTOP --- */
+    html {
+        background-color: #111; /* Background luar area HP */
         display: flex;
         justify-content: center;
-        align-items: center;
+        min-height: 100vh;
     }
 
-    /* Container Utama (Simulasi Layar HP) */
-    .app-container {
-        width: 100%;
-        max-width: var(--mobile-width);
-        height: 100%;
-        background: linear-gradient(180deg, var(--bg), #020305);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; /* Clip elemen yang keluar */
-        box-shadow: 0 0 50px rgba(0,0,0,0.5);
-        transition: background 0.3s;
+    body{
+      margin:0;
+      background: linear-gradient(180deg, var(--bg), #020305);
+      color:var(--text-main);
+      user-select: none; 
+      -webkit-user-select: none;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+      width: 100%;
+      max-width: var(--mobile-width);
+      position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
     }
 
     /* Override Background untuk Light Mode */
-    [data-theme="light"] .app-container {
+    body[data-theme="light"] {
         background: var(--bg);
     }
 
@@ -84,43 +81,13 @@
       pointer-events: none; user-select: none; -webkit-user-drag: none;
       transition: filter 0.3s;
     }
+    /* Filter CSS untuk tampilan layar (browser) */
     [data-theme="light"] .locked-image {
        filter: invert(1) hue-rotate(180deg);
     }
     
-    /* --- HEADER & FOOTER (Absolute Positioning inside Container) --- */
-    .topbar { 
-        position: absolute; 
-        top: 0; left: 0; right: 0; 
-        z-index: 10;
-        background: var(--bg); /* Fallback */
-        transition: background 0.3s;
-    }
-    
-    .bottom { 
-        position: absolute; 
-        bottom: 0; left: 0; right: 0; 
-        z-index: 10;
-        background: linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3)); 
-        pointer-events: none; 
-    }
-    .bottom img { pointer-events: none; }
-
-    /* --- CONTENT LIST (Internal Scrolling) --- */
-    .list {
-        flex: 1; /* Mengisi ruang sisa antara header dan footer */
-        overflow-y: auto; /* Scroll terjadi DI SINI */
-        padding-top: 160px; /* Sesuaikan tinggi header */
-        padding-bottom: 100px; /* Sesuaikan tinggi footer */
-        
-        /* Hide Scrollbar untuk tampilan lebih bersih */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none;  /* IE 10+ */
-    }
-    .list::-webkit-scrollbar { 
-        width: 0px;
-        background: transparent; /* Chrome/Safari/Webkit */
-    }
+    /* --- LIST --- */
+    .list{padding:0 0 120px 0}
     
     .item{
       display:flex; align-items:center; gap:14px;
@@ -147,12 +114,16 @@
       flex:1; min-width:0;
       padding-bottom: 14px;
       display: flex; flex-direction: column; justify-content: center;
-      border-bottom: none; /* Garis dihapus */
+      /* UPDATE: Border dihapus agar tidak ada garis putih/abu */
+      border-bottom: none;
     }
+    .item:last-child .meta { border-bottom: none; }
     
     .top-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    
     .name{font-weight:500; font-size: 17px; color: var(--text-main);}
     .time{color:var(--muted); font-size:12px;}
+    
     .bot-row { display: flex; justify-content: space-between; align-items: center; }
     
     .preview{
@@ -171,27 +142,45 @@
 
     /* --- FAB (NEW CHAT) --- */
     .fab{
-      position:absolute; /* Absolute relative to App Container */
-      bottom: 88px;
-      right: 20px; /* Diposisikan relatif kanan container */
-      width: 80px; height: 80px; /* Ukuran container FAB disesuaikan */
+      position:fixed; 
+      bottom:88px;
+      width:130px; height:130px;
       background: transparent;
       display:flex; align-items:center; justify-content:center;
-      cursor: pointer; z-index: 15;
+      cursor: pointer; z-index: 10;
       transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .fab img { 
-        width: 130px; /* Gambar asli mungkin punya padding transparan, kita atur ulang */
-        max-width: none; /* Biarkan overflow jika perlu untuk centering efek shadow */
-        pointer-events: none; 
-        transition: filter 0.3s; 
+      left: 50%; 
+      right: auto;
+      margin-left: 90px; 
     }
     .fab:active { transform: scale(0.92); }
+    .fab img { pointer-events: none; user-select: none; -webkit-user-drag: none; transition: filter 0.3s; }
+    
 
-    /* --- MODAL SYSTEM (Tetap Fixed Fullscreen atau Absolute Container) --- */
-    /* Kita gunakan absolute agar tetap di dalam konteks HP */
+    /* --- FIXED BARS (TOP & BOTTOM) --- */
+    .topbar, .bottom { 
+        position:fixed; 
+        z-index: 5;
+        width: 100%;
+        max-width: var(--mobile-width);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .topbar { top:0; background: var(--bg); transition: background 0.3s; }
+    .bottom { bottom:0; background: linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3)); pointer-events: none; }
+    .bottom img { pointer-events: none; }
+    
+    .spacer-top { height: 170px; } 
+    
+    @media (min-width: 481px) {
+      .spacer-top { height: 190px; }
+    }
+
+    /* --- MODAL SYSTEM --- */
     .modal-overlay {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed; top: 0; bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: var(--mobile-width);
       background: rgba(0,0,0,0.6);
       display: flex; align-items: flex-end; 
       justify-content: center;
@@ -204,7 +193,7 @@
     
     .modal-container {
       background: var(--modal-bg);
-      width: 100%;
+      width: 100%; max-width: 400px;
       border-radius: 20px 20px 0 0; 
       padding: 24px 24px 40px 24px;
       box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
@@ -216,6 +205,7 @@
     
     .modal-overlay.open .modal-container {
       transform: translateY(0);
+      opacity: 1;
     }
 
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -285,7 +275,9 @@
 
     /* --- CONFIRMATION POPUP (Custom) --- */
     .confirm-overlay {
-      position: absolute; top:0; left:0; right:0; bottom:0;
+      position: fixed; top:0; height:100%;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: var(--mobile-width);
       background: rgba(0,0,0,0.7); z-index: 200;
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
@@ -310,7 +302,7 @@
 
     /* --- TOAST NOTIFICATION --- */
     .toast {
-      position: absolute; bottom: 100px; 
+      position: fixed; bottom: 100px; 
       left: 50%; transform: translateX(-50%) translateY(20px);
       background: #333; color: white; padding: 12px 24px;
       border-radius: 50px; font-size: 14px;
@@ -322,7 +314,9 @@
     
     /* Loading Overlay */
     .loading-overlay {
-        position: absolute; top:0; left:0; right:0; bottom:0;
+        position: fixed; top:0; height:100%;
+        left: 50%; transform: translateX(-50%);
+        width: 100%; max-width: var(--mobile-width);
         background: rgba(0,0,0,0.8); z-index: 999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         color: #00a884; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -338,111 +332,105 @@
   </style>
 </head>
 <body>
-  <!-- CONTAINER UTAMA (SIMULASI HP) -->
-  <div class="app-container">
 
-      <!-- LOADING SCREENSHOT -->
-      <div class="loading-overlay" id="loadingOverlay">
-          <div class="spinner"></div>
-          <div>Memproses Gambar...</div>
-      </div>
+  <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div>Memproses Gambar...</div>
+  </div>
 
-      <div class="topbar">
-        <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" crossorigin="anonymous" />
+  <div class="topbar">
+    <img src="https://i.imghippo.com/files/wC5348bFU.jpg" draggable="false" class="locked-image" alt="Top Bar" crossorigin="anonymous" />
+  </div>
+  <div class="spacer-top"></div>
+
+  <div class="list" id="chatList"></div>
+
+  <div class="fab" title="Buat Chat Baru" onclick="openEditor()">
+    <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));" crossorigin="anonymous">
+  </div>
+
+  <div class="bottom">
+    <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" crossorigin="anonymous" />
+  </div>
+
+  <!-- EDITOR MODAL -->
+  <div class="modal-overlay" id="editorModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Edit Chat</div>
+        <div class="header-actions">
+            <button class="btn-header-icon" title="Ganti Tema" onclick="toggleTheme()">
+                <svg id="themeIcon" viewBox="0 0 24 24">
+                    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                </svg>
+            </button>
+
+            <button class="btn-header-icon" title="Download Screenshot" onclick="downloadFromModal()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"/>
+                </svg>
+            </button>
+            
+            <button class="btn-close-icon" onclick="closeEditor()">&times;</button>
+        </div>
       </div>
       
-      <!-- CONTENT AREA -->
-      <div class="list" id="chatList"></div>
-
-      <!-- FAB -->
-      <div class="fab" title="Buat Chat Baru" onclick="openEditor()">
-        <img id="fabIcon" src="https://i.imghippo.com/files/toKE4058Rk.png" draggable="false" alt="New Chat" style="transform: translate(15px, 10px); width: 100%;" crossorigin="anonymous">
+      <div class="form-group">
+        <label class="form-label">Nama Kontak</label>
+        <input type="text" class="form-input" id="inpName" placeholder="Nama...">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Pesan Terakhir</label>
+        <input type="text" class="form-input" id="inpMsg" placeholder="Pesan...">
       </div>
 
-      <div class="bottom">
-        <img src="https://i.imghippo.com/files/JV5005ev.jpg" draggable="false" class="locked-image" alt="Bottom Bar" crossorigin="anonymous" />
-      </div>
-
-      <!-- EDITOR MODAL -->
-      <div class="modal-overlay" id="editorModal">
-        <div class="modal-container">
-          <div class="modal-header">
-            <div class="modal-title" id="modalTitle">Edit Chat</div>
-            <div class="header-actions">
-                <button class="btn-header-icon" title="Ganti Tema" onclick="toggleTheme()">
-                    <svg id="themeIcon" viewBox="0 0 24 24">
-                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
-                    </svg>
-                </button>
-
-                <button class="btn-header-icon" title="Download Screenshot" onclick="downloadFromModal()">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"/>
-                    </svg>
-                </button>
-                
-                <button class="btn-close-icon" onclick="closeEditor()">&times;</button>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Nama Kontak</label>
-            <input type="text" class="form-input" id="inpName" placeholder="Nama...">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Pesan Terakhir</label>
-            <input type="text" class="form-input" id="inpMsg" placeholder="Pesan...">
-          </div>
-
-          <div class="row">
-            <div class="form-group" style="flex:1">
-              <label class="form-label">Waktu</label>
-              <input type="text" class="form-input" id="inpTime" placeholder="12:00">
-            </div>
-            <div class="form-group" style="width:80px">
-              <label class="form-label">Unread</label>
-              <input type="number" class="form-input" id="inpUnread" value="0">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Foto Profil</label>
-            <div class="avatar-selector">
-                <div class="avatar-preview-small" id="avatarPrev">A</div>
-                <div style="flex:1">
-                    <input type="text" class="form-input" id="inpAvatarText" placeholder="Ketik Inisial" style="margin-bottom:6px; font-size:13px; padding:8px;">
-                    <label class="file-btn">
-                        + Upload Foto
-                        <input type="file" id="inpAvatarFile" accept="image/*" style="display:none">
-                    </label>
-                </div>
-            </div>
-            <input type="hidden" id="currentImageBase64">
-          </div>
-
-          <div class="modal-actions">
-            <button class="btn btn-danger" id="btnDelete" onclick="tryDelete()">Hapus</button>
-            <button class="btn btn-primary" onclick="saveChat()">Simpan</button>
-          </div>
+      <div class="row">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Waktu</label>
+          <input type="text" class="form-input" id="inpTime" placeholder="12:00">
+        </div>
+        <div class="form-group" style="width:80px">
+          <label class="form-label">Unread</label>
+          <input type="number" class="form-input" id="inpUnread" value="0">
         </div>
       </div>
 
-      <!-- CUSTOM CONFIRM MODAL -->
-      <div class="confirm-overlay" id="confirmModal">
-        <div class="confirm-box">
-          <div class="confirm-text" id="confirmText">Konfirmasi?</div>
-          <div class="confirm-buttons">
-            <button class="c-btn c-btn-cancel" onclick="closeConfirm()">Batal</button>
-            <button class="c-btn c-btn-ok" id="confirmOkBtn">Ya</button>
-          </div>
+      <div class="form-group">
+        <label class="form-label">Foto Profil</label>
+        <div class="avatar-selector">
+            <div class="avatar-preview-small" id="avatarPrev">A</div>
+            <div style="flex:1">
+                <input type="text" class="form-input" id="inpAvatarText" placeholder="Ketik Inisial" style="margin-bottom:6px; font-size:13px; padding:8px;">
+                <label class="file-btn">
+                    + Upload Foto
+                    <input type="file" id="inpAvatarFile" accept="image/*" style="display:none">
+                </label>
+            </div>
         </div>
+        <input type="hidden" id="currentImageBase64">
       </div>
 
-      <!-- TOAST NOTIFICATION -->
-      <div class="toast" id="toast">Notifikasi</div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="btnDelete" onclick="tryDelete()">Hapus</button>
+        <button class="btn btn-primary" onclick="saveChat()">Simpan</button>
+      </div>
+    </div>
+  </div>
 
-  </div> <!-- END APP CONTAINER -->
+  <!-- CUSTOM CONFIRM MODAL -->
+  <div class="confirm-overlay" id="confirmModal">
+    <div class="confirm-box">
+      <div class="confirm-text" id="confirmText">Konfirmasi?</div>
+      <div class="confirm-buttons">
+        <button class="c-btn c-btn-cancel" onclick="closeConfirm()">Batal</button>
+        <button class="c-btn c-btn-ok" id="confirmOkBtn">Ya</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">Notifikasi</div>
 
   <script>
     const avatarColors = [
@@ -678,18 +666,17 @@
         loading.classList.add('show');
         const fab = document.querySelector('.fab');
         fab.style.display = 'none';
-        
-        // Scroll container to top
-        const appContainer = document.querySelector('.app-container');
-        
-        // Use html2canvas on the App Container only
+        window.scrollTo(0,0);
+
         setTimeout(() => {
             let currentBg = isLightMode ? '#ffffff' : '#04070a';
             
-            html2canvas(appContainer, {
+            html2canvas(document.body, {
                 useCORS: true, 
                 allowTaint: true,
-                backgroundColor: currentBg,
+                backgroundColor: currentBg, 
+                windowWidth: document.documentElement.clientWidth,
+                windowHeight: document.documentElement.clientHeight,
                 ignoreElements: (element) => {
                     return element.id === 'loadingOverlay';
                 },
@@ -698,13 +685,20 @@
                     if (isLightMode) {
                         const images = clonedDoc.querySelectorAll('.locked-image');
                         images.forEach(img => {
+                            // Create temp canvas to bake filter
                             const canvas = document.createElement('canvas');
+                            // Using natural dimensions ensures high quality bake
                             canvas.width = img.naturalWidth || img.width; 
                             canvas.height = img.naturalHeight || img.height;
                             const ctx = canvas.getContext('2d');
+                            
+                            // Apply filter in canvas context
                             ctx.filter = 'invert(1) hue-rotate(180deg)';
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
+                            // Replace img src with baked canvas
                             img.src = canvas.toDataURL();
+                            // Remove CSS filter to avoid double inversion
                             img.style.filter = 'none'; 
                         });
                     }
